@@ -1,0 +1,14 @@
+name = "BEETS"
+id_prefix = "FM-1_731"
+usb_manufacturer = "mattb"
+usb_product = "BEETS FM-1"
+o2 = ["dsp/engine.c"]
+words = "words.tsv"
+ble = false
+usb_audio_in = true
+usb_audio_out = false
+gen = ["../tools/prepare_samples.py --out {gen}/beets_samples.h"]
+tagline = "Two breaks. Eight slices. Happy accidents."
+repo = "https://github.com/mattb/beets"
+licence = "MIT AND MPL-2.0"
+credits = "Beets by Matt Biddulph. Demo loops by vcvcvc_val. Platform by Charles Vestal and Hugelton."

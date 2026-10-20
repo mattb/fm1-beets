@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: MPL-2.0
+# Beets screen-reader words.
+# url: https://mattb.github.io/fm1-beets/words/
+BEETS	beets
+REPT	repeat probability
+SKIP	skip probability
+REV	reverse probability
+STUT	stutter probability
+LOOP	loop change probability
+KNOBS: DECK A	knobs control deck A
+KNOBS: DECK B	knobs control deck B

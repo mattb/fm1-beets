@@ -1,0 +1,20 @@
+wait 600
+shot stopped.png
+tap PLAY
+wait 700
+shot playing.png
+tap OCT+
+tap GLO
+turn K1 5
+turn K3 7
+turn K4 9
+wait 700
+shot probabilities.png
+key 18 down
+key 24 down
+wait 200
+key 18 up
+key 24 up
+wait 200
+shot range.png
+tap PLAY

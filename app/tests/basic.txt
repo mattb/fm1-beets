@@ -1,0 +1,219 @@
+# FM-1 physical controls, two-deck performance and persistent settings.
+# tools/build-local.sh --host && app/build/host/beets_host app/tests/basic.txt app/build/tests/host
+wait 600
+expect playing 0
+expect tempo 160
+expect focus 0
+expect a_muted 0
+expect b_muted 1
+expect a_loop 0
+expect b_loop 1
+shot boot.png
+# Knobs have stable meanings; probability steps are 5%.
+turn SELECT 17
+turn PRESET -10
+turn K1 4
+turn K2 6
+turn K3 8
+turn K4 10
+turn ALGO 2
+wait 40
+expect tempo 177
+expect blend 40
+expect a_prob0 20
+expect a_prob1 30
+expect a_prob2 40
+expect a_prob3 50
+expect a_prob4 10
+# Sample keys are black keys; white banks never redirect knob focus.
+key 17 down
+wait 30
+key 17 up
+wait 30
+expect a_loop 7
+key 18 down
+wait 30
+key 18 up
+wait 30
+expect focus 0
+expect b_slice 2
+# Hold endpoints in either order: persistent range without a mode switch.
+key 9 down
+wait 30
+key 4 down
+wait 30
+expect a_first 2
+expect a_last 5
+key 9 up
+key 4 up
+wait 30
+# EDIT toggles eligibility, release never leaves a modifier latched.
+press EDIT
+key 0 down
+wait 30
+key 0 up
+key 3 down
+wait 30
+key 3 up
+release EDIT
+wait 30
+expect a_slice_mask 254
+expect a_loop_mask 1021
+# Independent mute, focus and momentary performance effects.
+tap GLO
+tap OCT+
+wait 30
+expect focus 1
+expect b_muted 0
+key 22 down
+wait 30
+key 22 up
+wait 30
+expect b_loop 9
+turn K1 3
+turn K2 5
+turn K3 7
+turn K4 9
+turn ALGO 1
+wait 30
+expect b_prob0 15
+expect b_prob1 25
+expect b_prob2 35
+expect b_prob3 45
+expect b_prob4 5
+press ENV
+press ARP
+wait 30
+expect b_reverse 1
+expect b_stutter 1
+expect a_reverse 0
+expect a_stutter 0
+tap OCT-
+wait 30
+expect focus 0
+expect a_reverse 0
+expect a_stutter 0
+expect b_reverse 1
+expect b_stutter 1
+release ENV
+release ARP
+wait 30
+expect a_reverse 0
+expect a_stutter 0
+expect a_prob2 40
+expect a_prob3 50
+# Lock is explicit. Repeated pad taps cannot accidentally enter a lock.
+tap LFO
+wait 30
+expect a_first 2
+expect a_last 2
+tap HOME
+wait 30
+expect a_first 0
+expect a_last 7
+key 4 down
+wait 30
+key 4 up
+wait 30
+key 4 down
+wait 30
+key 4 up
+wait 30
+expect a_first 0
+expect a_last 7
+# Restore A range and set B range independently; selected deck remains B.
+key 4 down
+key 9 down
+wait 30
+key 4 up
+key 9 up
+tap OCT+
+key 24 down
+wait 30
+key 18 down
+wait 30
+key 24 up
+key 18 up
+wait 30
+expect b_first 2
+expect b_last 6
+press EDIT
+key 14 down
+wait 30
+key 14 up
+key 1 down
+wait 30
+key 1 up
+release EDIT
+wait 30
+expect b_slice_mask 254
+expect b_loop_mask 1022
+tap SEQ
+tap FX
+wait 30
+expect b_auto 1
+expect b_bypass 1
+expect dirty 1
+tap SAVE
+wait 30
+expect dirty 0
+expect store_writes 1
+shot configured.png
+reboot
+wait 600
+expect playing 0
+expect tempo 177
+expect blend 40
+expect focus 1
+expect a_loop 7
+expect b_loop 9
+expect a_first 2
+expect a_last 5
+expect b_first 2
+expect b_last 6
+expect a_slice_mask 254
+expect b_slice_mask 254
+expect a_loop_mask 1021
+expect b_loop_mask 1022
+expect a_prob0 20
+expect a_prob4 10
+expect b_prob0 15
+expect b_prob4 5
+expect b_auto 1
+expect b_bypass 1
+expect a_reverse 0
+expect b_stutter 0
+# Actual output from the original sample pack and a screenshot of playback.
+tap PLAY
+wait 100
+expect playing 1
+# Saving while playing must not block the audio callback with flash writes.
+turn SELECT 1
+wait 30
+expect dirty 1
+tap SAVE
+wait 30
+expect store_writes 1
+expect dirty 1
+wav performance.wav
+wait 3000
+shot playing.png
+press ENV
+press ARP
+wait 1500
+release ENV
+release ARP
+wait 1500
+wavstop
+expect peak_db_min -30
+tap PLAY
+wait 150
+expect playing 0
+# MIDI notes on channel 2 address deck B while stopped (physical/UI state unchanged).
+midi 91 27 64
+wait 40
+expect b_slice 3
+expect focus 1
+listen
+wait 100
+said BEETS
