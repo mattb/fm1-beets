@@ -109,6 +109,13 @@ sample loading/edit pages, crow integration and arc hardware support are omitted
 See the [current verification record](docs/VERIFICATION.md) for builds, installed
 firmware, hardware USB checks and remaining physical audio/control coverage gaps.
 
+## MIDI clock
+
+Beets follows incoming MIDI clock over USB or TRS and sends clock over USB.
+Start, Continue and Stop are supported, with automatic source selection and
+stop on clock loss. The FM1 TRS jack is input-only. See [MIDI clock setup and
+Eurorack conversion options](docs/MIDI-CLOCK.md).
+
 ## USB MIDI visualizer feed
 
 Firmware 0.2.0 and later emit ASCII JSON in versioned SysEx over class-compliant USB MIDI:

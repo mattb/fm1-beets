@@ -63,6 +63,7 @@ uint32_t beets_telemetry_serialize(uint8_t *out, uint32_t capacity,
     bt_ki(&j, "playing", state->playing); bt_ki(&j, "step", state->step);
     bt_ku(&j, "frames", state->frames); bt_ku(&j, "ticks", state->ticks); bt_ku(&j, "rng", state->rng);
     bt_ku(&j, "clock_phase", ui->clock_phase);
+    bt_ki(&j, "clock_source", ui->clock_source);
     jems_key_array_open(&j, "lanes");
     for (lane = 0; lane < BEETS_LANES; lane++) {
         const BeetsLaneState *s = &state->lane[lane];

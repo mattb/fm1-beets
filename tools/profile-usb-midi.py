@@ -14,6 +14,11 @@ if not 1<=a.seconds<=30: p.error('seconds must be between 1 and 30')
 results=[]; initial=None; last=None
 with mido.open_input(a.port) as inp,mido.open_output(a.port) as out:
  def send(mode): out.send(mido.Message('sysex',data=[0x7d,66,80,mode]))
+ def transport(playing):
+  out.send(mido.Message('stop')); receive(.7)
+  if playing:
+   out.send(mido.Message('sysex',data=[0x7d,0x4c,0x43,1,0,8])); receive(.15)
+   out.send(mido.Message('sysex',data=[0x7d,0x4c,0x43,1,0,0])); receive(.15)
  def receive(seconds):
   global last
   reports=[]; deadline=time.monotonic()+seconds
@@ -32,7 +37,7 @@ with mido.open_input(a.port) as inp,mido.open_output(a.port) as out:
  try:
   receive(1.2); initial=last
   for playing in (0,1):
-   out.send(mido.Message('start' if playing else 'stop'));receive(.3)
+   transport(playing)
    for label,mode in [('normal',0),('disabled',2),('blocked',3)]:
     send(mode); receive(a.seconds);send(1); reports=receive(.3)
     if not reports: raise RuntimeError('No BP profile reply; install BEETS_PROFILE=1 firmware')
@@ -44,6 +49,6 @@ with mido.open_input(a.port) as inp,mido.open_output(a.port) as out:
     row.update(rejected=v[13],max_irq_lock_us=v[14],audio_xruns=v[15],audio_render_pct=v[16])
     results.append(row); print(json.dumps(row),flush=True)
  finally:
-  send(0);out.send(mido.Message('start' if initial and initial['playing'] else 'stop'));receive(.2)
+  send(0);transport(bool(initial and initial['playing']))
 Path(a.output).parent.mkdir(parents=True,exist_ok=True)
 Path(a.output).write_text(json.dumps(results,indent=2)+'\n')

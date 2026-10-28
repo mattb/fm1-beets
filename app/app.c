@@ -4,6 +4,7 @@
  * Musical engine: dsp/engine.c, derived from Matt Biddulph's MIT Beets. */
 #include "dsp/engine.h"
 #include "telemetry_stream.h"
+#include "midi_clock.h"
 #define BEETS_SAVE_MAGIC 0x42545332u
 static const uint8_t beets_white[16] = PLAT_WHITE_KEYS;
 static const uint8_t beets_black[11] = PLAT_BLACK_KEYS;
@@ -58,21 +59,23 @@ void app_init(void)
     beets_stream_init();
     if (plat_store_load(OBJ_SETTINGS, &saved, sizeof saved) == (int)sizeof saved && saved.magic == BEETS_SAVE_MAGIC)
         beets_restore(&saved);
+    beets_clock_init();
     beets_snapshot();
 }
 void app_render(int32_t *lr, uint32_t n, uint32_t master_q12)
 {
     uint32_t pkt; int port;
+    beets_clock_poll(plat_ms());
     while (plat_midi_in(&pkt, &port)) {
+        if (beets_clock_receive(pkt, port, plat_midi_in_from(), plat_ms())) continue;
         unsigned status = pkt >> 8 & 255u, note = pkt >> 16 & 127u, vel = pkt >> 24 & 127u;
         if ((status & 0xf0u) == 0x90u && vel && note >= 36u && note < 44u)
             engine_trigger((status & 15u) == 1u ? 1 : 0, (int)note - 36);
-        else if (status == 0xFAu) engine_play(1);
-        else if (status == 0xFCu) engine_play(0);
+
     }
     engine_render(lr, n, master_q12);
 }
-void app_panic(void) { uint32_t irq = plat_lock(); engine_panic(); plat_unlock(irq); }
+void app_panic(void) { uint32_t irq = plat_lock(); beets_clock_play(0); engine_panic(); plat_unlock(irq); }
 static void beets_save(void)
 {
     BeetsSave saved; int d;
@@ -127,7 +130,7 @@ static void beets_input(void)
     if (down & (1u << B_OCTDN)) { beets_ui.focus = 0; beets_cat(msg, "FOCUS DECK A"); }
     if (down & (1u << B_OCTUP)) { beets_ui.focus = 1; beets_cat(msg, "FOCUS DECK B"); }
     d = beets_ui.focus;
-    if (down & (1u << B_PLAY)) engine_play(!beets_ui.state.playing);
+    if (down & (1u << B_PLAY)) beets_clock_play(!beets_ui.state.playing);
     if (down & (1u << B_SEL)) { engine_mute(0, !beets_ui.state.lane[0].muted); beets_ui.dirty = 1; }
     if (down & (1u << B_GLO)) { engine_mute(1, !beets_ui.state.lane[1].muted); beets_ui.dirty = 1; }
     if (down & (1u << B_FX)) { engine_bypass(d, !beets_ui.state.lane[d].bypass); beets_ui.dirty = 1; }
@@ -180,7 +183,7 @@ static void beets_input(void)
         int p = i == EN_ALGO ? BEETS_SWITCH : i - EN_K1;
         knob = i;
         input.enc[i] = e;
-        if (i == EN_SELECT) engine_tempo(beets_ui.state.tempo + e);
+        if (i == EN_SELECT) { if (!beets_clock_external()) engine_tempo(beets_ui.state.tempo + e); }
         else if (i == EN_PRESET) engine_blend(beets_ui.state.blend + e);
         else if (p >= 0 && p < 5) engine_probability(d, p, beets_ui.state.lane[d].probability[p] + e * 5);
         beets_ui.dirty = 1;
@@ -198,7 +201,8 @@ static void beets_input(void)
     if (down & (1u << B_REC)) app_say("RE-CUE", "BOTH DECKS");
     if (down & (1u << B_EDIT)) app_say("HOLD EDIT", "KEYS TOGGLE ELIGIBILITY");
     if (msg[0]) app_say(msg, "");
-    if (knob >= 0) {
+    if (knob == EN_SELECT && beets_clock_external()) app_say("EXTERNAL CLOCK", "TEMPO FROM MIDI");
+    else if (knob >= 0) {
         static const char *const names[5] = {"REPEAT", "SKIP", "REVERSE", "STUTTER", "LOOP SWITCH"};
         char n[12]; int value;
         msg[0] = 0;
@@ -258,6 +262,7 @@ static void beets_draw(void)
     cv_text(5, 3, &FONT_B, "BEETS", C_WHITE);
     beets_number(s->tempo, t); beets_cat(t, " BPM"); cv_text(82, 5, &FONT_XS, t, C_HI);
     cv_text(174, 5, &FONT_XS, s->playing ? "PLAYING" : "STOPPED", s->playing ? C_HI : C_GRAY);
+    cv_text(82, 18, &FONT_T, beets_clock_external() == 1 ? "USB CLOCK" : beets_clock_external() == 2 ? "TRS CLOCK" : "INT CLOCK", C_GRAY);
     cv_blit(0, 0);
     beets_draw_lane(0, 30); beets_draw_lane(1, 88);
     cv_begin(240, 64, C_BLACK);
@@ -363,6 +368,7 @@ void app_telemetry_snapshot(BeetsState *snapshot, BeetsTelemetryUI *ui)
     uint32_t now = plat_ms(), irq = plat_lock();
     engine_snapshot(snapshot);
     ui->clock_phase = engine_clock_phase();
+    ui->clock_source = beets_clock_external();
     engine_playback_snapshot(ui->playback);
     plat_unlock(irq);
     BP_END(1, snap);

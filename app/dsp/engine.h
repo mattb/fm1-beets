@@ -55,3 +55,9 @@ typedef struct {
     uint32_t position_ppm, audition_remaining, window_start_ppm, window_end_ppm, gain_ppm;
 } BeetsPlaybackState;
 void engine_playback_snapshot(BeetsPlaybackState out[BEETS_LANES]);
+
+/* Transient MIDI clock integration; configure under the engine lock. */
+void engine_clock_output(void (*send)(uint8_t status));
+void engine_external_clock(int enabled);
+void engine_clock_pulse(void); /* one 24-PPQN pulse while externally running */
+void engine_continue(void);    /* preserve step and pulse phase after Stop */

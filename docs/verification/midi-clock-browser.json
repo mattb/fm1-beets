@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-28",
+  "target": "Chrome WASM",
+  "result": "PASS",
+  "checks": [
+    "power on",
+    "play",
+    "Amen A",
+    "B unmute and focus",
+    "repeat",
+    "latched B3-B6 range",
+    "release and HOME",
+    "stop",
+    "INT CLOCK indicator"
+  ],
+  "console_warnings_errors": [],
+  "limits": [
+    "No listening test",
+    "No browser Web MIDI test"
+  ],
+  "artifacts": {
+    "app/build/emu/app.wasm": {
+      "sha256": "230d85b7cfc661801e942e77a8dd95f05bdccec8b55b8625450efab7a337e218"
+    },
+    "app/build/beets-0.3.0.fwsc": {
+      "sha256": "108f4e6cad693fc10ba881b88f9937abec1bcd41223dc582b7cc9bc3708225b8"
+    },
+    "app/build/tests/midi-clock-chrome-stopped.jpg": {
+      "sha256": "fb2418fc6a7a981450b0c1509de2d314185c66e87dc8b68b83a83902d65f85ed"
+    }
+  }
+}

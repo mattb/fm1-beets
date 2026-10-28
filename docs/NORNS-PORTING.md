@@ -76,7 +76,7 @@ Specify immediate versus quantized actions, transport restart, cue priorities, r
 
 External sync is a separate requirement: implement and test phase tracking, tempo changes, clock loss, Start/Continue/Stop, and any supported song position. Norns' [clock integration](https://monome.org/docs/norns/control-clock/) does not transfer automatically to the new app. Accepting MIDI notes or Start/Stop does not prove MIDI-clock synchronization.
 
-> Beets example: its eighth-note clock adds `BPM * 2` per rendered sample and crosses `44100 * 60`, retaining the remainder. Repeat/skip ordering and bar anchoring are tested independently of rendering block size. External MIDI clock and Link are not implemented.
+> Beets example: its eighth-note clock adds `BPM * 2` per rendered sample and crosses `44100 * 60`, retaining the remainder. Repeat/skip ordering and bar anchoring are tested independently of rendering block size. The [MIDI clock adapter](MIDI-CLOCK.md) now drives external steps from incoming pulses; Link remains unimplemented.
 
 ## Keep the shared engine boundary small
 

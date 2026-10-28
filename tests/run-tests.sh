@@ -24,6 +24,11 @@ cc -std=c99 -Wall -Wextra -Werror -O1 -g \
 app/build/tests/contract-test | tee app/build/tests/contract.log
 cc -std=c99 -Wall -Wextra -Werror -O1 -g \
   -fsanitize=address,undefined -fno-omit-frame-pointer \
+  -Iapp -Iapp/build/gen -I"$BASE/include" tests/midi_clock_test.c app/midi_clock.c app/dsp/engine.c \
+  -o app/build/tests/midi-clock-test
+app/build/tests/midi-clock-test | tee app/build/tests/midi-clock.log
+cc -std=c99 -Wall -Wextra -Werror -O1 -g \
+  -fsanitize=address,undefined -fno-omit-frame-pointer \
   -Iapp -I"$BASE/include" tests/telemetry_transport_test.c \
   app/telemetry_stream.c app/telemetry.c app/vendor/jems/jems.c \
   -o app/build/tests/telemetry-transport-test

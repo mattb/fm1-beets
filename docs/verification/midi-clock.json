@@ -1,0 +1,27 @@
+{
+  "result": "PASS",
+  "port": "X0X FM-1",
+  "internal_bpm": 160,
+  "output_clocks": 332,
+  "output_hz": 64.0709206293334,
+  "host_gap_ms": {
+    "median": 17.224249999344465,
+    "p95": 23.684708001383115,
+    "max": 36.13404200041259
+  },
+  "external": [
+    {
+      "sent_bpm": 120,
+      "measured_bpm": 120,
+      "no_usb_echo": true,
+      "stop_continue": true
+    },
+    {
+      "sent_bpm": 180,
+      "measured_bpm": 178,
+      "no_usb_echo": true,
+      "stop_continue": true
+    }
+  ],
+  "clock_loss_stops": true
+}

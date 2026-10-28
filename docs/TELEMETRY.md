@@ -71,13 +71,14 @@ Both message types contain `v:1`, `type`, `seq`, and `ms`.
 | `frames` | Total rendered stereo sample frames, including stopped time; uint32 wraps. |
 | `ticks` | Cumulative eighth-note triggers; uint32 wraps. Start triggers an eighth immediately. |
 | `rng` | Engine's current random-generator state; diagnostic, not a UI control. |
+| `clock_source` | 0 internal, 1 USB MIDI, 2 TRS MIDI. Added in firmware 0.3.0. |
 | `clock_phase` | Integer numerator of position within the current eighth; denominator **2646000**. |
 | `lanes` | Two objects, ordered A then B, described below. |
 | `playheads` | Two actual playback-position objects, ordered A then B. |
 | `ui` | Panel/display state, described below. |
 
 The normalized eighth phase is `clock_phase / 2646000`; its first/second half
-corresponds to the two sixteenths. The audio engine supplies this clock independently of host wall time and MIDI Clock. Transport start resets the phase and `step`; `ticks` is cumulative.
+corresponds to the two sixteenths. The audio engine supplies the internal clock; external MIDI pulses drive steps when selected (see [MIDI clock](MIDI-CLOCK.md)). Transport start resets the phase and `step`; `ticks` is cumulative.
 A visualizer may interpolate between snapshots using tempo while playing, then
 resynchronize on each snapshot. Do not advance the phase while stopped.
 

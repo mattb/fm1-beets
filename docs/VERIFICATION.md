@@ -1,12 +1,30 @@
 # Current verification record
 
-Updated 2026-10-28. Installed firmware uses runtime source `14cd0d9`
-(telemetry optimization), also included in `5584cd9`. The fixture update
-`a4e9b0a` added tests and documentation. Subsequent prose and browser-copy edits
-leave the firmware unchanged. The platform pin
-and carried patches are described in [DEPENDENCIES.md](DEPENDENCIES.md).
+Updated 2026-10-28. Installed production firmware is **0.3.0**, device identity
+`FM-1_731000300`. This revision adds MIDI clock and updates the platform pin.
+The platform and carried patches are described in [DEPENDENCIES.md](DEPENDENCIES.md).
 
-## Evidence
+## MIDI clock update
+
+- Firmware, native host and WASM builds passed (`build/logs/midi-clock-all.log`).
+- Full automated suite passed, including sanitized clock/controller tests and
+  existing behavior, telemetry, native and WASM checks
+  (`build/logs/midi-clock-suite-final.log`).
+- The physical USB clock harness passed input at 120/180 BPM, outgoing clock,
+  transport, clock loss and no echo. [Result](verification/midi-clock.json).
+- Physical JSON-over-SysEx smoke passed: 145 state and 8 input frames, no sequence
+  gaps or new input drops. [Result](verification/midi-clock-telemetry.json).
+- Chrome smoke passed power-on, PLAY, Amen selection, B unmute/focus, repeat,
+  latched B3–B6 range, release/HOME and STOP. The screen showed `INT CLOCK` and
+  moving playheads; no captured console warnings/errors. This checks interaction,
+  not listening or browser Web MIDI. [Artifact record](verification/midi-clock-browser.json).
+- Physical TRS and analog conversion remain untested. USB arrival timing and
+  source-selection policy are described in [MIDI clock](MIDI-CLOCK.md).
+
+The following records describe earlier revisions; processing-cost and TouchOSC
+measurements have not been repeated on 0.3.0.
+
+## Earlier evidence
 
 The prose update rebuilt WASM and passed the full suite. A fresh Chrome session
 checked the revised instructions, playback, deck selection, probability adjustment,
@@ -18,7 +36,7 @@ Build and test logs are `build/logs/prose-web-build.log` and `build/logs/prose-s
 |---|---|---|
 | Source contract fixtures | Passed in the fixture update: six literal boundary traces plus the FM1 manual-priority adaptation, with ASan/UBSan. No Norns audio oracle. | [Fixture provenance and limits](../tests/fixtures/README.md); `app/build/tests/contract.log` |
 | Full automated suite | Passed in the fixture update using existing native/WASM artifacts: asset provenance/decoding, sanitized engine and telemetry, host controls/persistence, actual WASM execution/audio/persistence. | `build/logs/contract-verification-suite.log`; `app/build/tests/` |
-| Three target builds | Passed on 2026-10-28 for the optimized runtime: firmware, native host, WASM. No runtime changes since. | `build/logs/telemetry-efficient-final-build.log`, `telemetry-efficient-host.log`, `telemetry-efficient-web.log` |
+| Three target builds | Passed on 2026-10-28 for the optimized runtime: firmware, native host, WASM. Superseded by the 0.3.0 build above. | `build/logs/telemetry-efficient-final-build.log`, `telemetry-efficient-host.log`, `telemetry-efficient-web.log` |
 | Physical firmware identity | Queried during the fixture update: `FM-1_731000203` running, USB port `X0X FM-1`. Production 0.2.3; profiling disabled. | `.venv/bin/python fm1-base/tools/fm1_install.py --info`; prior install log `build/logs/telemetry-efficient-final-flash.log` |
 | Physical USB MIDI | Passed on 2026-10-28 on production 0.2.3: 138 state + 6 input frames, no sequence gaps/new drops. ASCII JSON/framing, Start/Stop, advancing playheads, remote encoder/key/button edges and ACK coexistence. | [Committed smoke summary](performance/production-smoke.json); local raw `build/tests/telemetry-efficient.syx` and `.jsonl` |
 | Device processing cost | Measured on 2026-10-28: enabled/disabled/forced-rejection sessions; zero observed xrun increments in short windows. Elapsed scopes include interrupt preemption. | [Performance report and raw results](TELEMETRY-PERFORMANCE.md) |
@@ -40,7 +58,7 @@ linked performance JSON and fixture expectations are committed. Run the checks a
 - Softcut render equivalence: the sample encoding, rate conversion and fades are
   deliberate adaptations. Literal decision traces do not prove audio parity.
 
-External MIDI clock sync, Link, arbitrary sample loading, recording/overdub,
+Link, arbitrary sample loading, recording/overdub,
 filters, crow and arc support are omitted from this app. See [scope and adaptations](PORT_REVIEW.md).
 
 ## Refreshing the record

@@ -52,8 +52,9 @@ with mido.open_input(args.port) as inp, mido.open_output(args.port) as out, \
         out.send(mido.Message('stop'))
         collect(1.2)
         assert states()[-1]['playing'] == 0, 'MIDI Stop not reflected'
-        # Real MIDI Start, then tempo detent through the existing panel remote protocol.
-        out.send(mido.Message('start'))
+        # Panel Start uses internal clock; MIDI sync is tested by smoke-midi-clock.py.
+        remote(1, 0, 8)
+        remote(1, 0, 0)
         collect(5)
         running = [s for s in states() if s['playing']]
         assert len(running) >= 15, 'insufficient tempo-aligned snapshots'
@@ -92,12 +93,15 @@ with mido.open_input(args.port) as inp, mido.open_output(args.port) as out, \
             diff = initial['tempo'] - states()[-1]['tempo']
             if diff:
                 remote(3, 0, 64 + diff)
-        out.send(mido.Message('start' if initial and initial['playing'] else 'stop'))
-        collect(.3)
+        out.send(mido.Message('stop'))
+        collect(.6)
+        if initial and initial['playing']:
+            remote(1, 0, 8)
+            remote(1, 0, 0)
 summary = {'result': 'PASS', 'port': args.port, 'state_frames': len(states()),
            'input_frames': len(records)-len(states()), 'max_frame_bytes': max(sizes),
            'sequence_gaps': 0, 'other_sysex_frames': len(other),
-           'checks': ['ASCII JSON and framing', 'contiguous sequence', 'MIDI Start/Stop',
+           'checks': ['ASCII JSON and framing', 'contiguous sequence', 'panel Start/MIDI Stop',
                       'advancing clock/playheads', 'encoder change and restore',
                       'button/key press and release', 'remote ACK coexistence', 'no new input drops']}
 base.with_suffix('.summary.json').write_text(json.dumps(summary, indent=2) + '\n')

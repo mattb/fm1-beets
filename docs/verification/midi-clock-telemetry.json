@@ -1,0 +1,19 @@
+{
+  "result": "PASS",
+  "port": "X0X FM-1",
+  "state_frames": 145,
+  "input_frames": 8,
+  "max_frame_bytes": 1508,
+  "sequence_gaps": 0,
+  "other_sysex_frames": 10,
+  "checks": [
+    "ASCII JSON and framing",
+    "contiguous sequence",
+    "panel Start/MIDI Stop",
+    "advancing clock/playheads",
+    "encoder change and restore",
+    "button/key press and release",
+    "remote ACK coexistence",
+    "no new input drops"
+  ]
+}

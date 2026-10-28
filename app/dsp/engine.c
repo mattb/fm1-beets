@@ -18,6 +18,30 @@ typedef struct {
 static BeetsState state;
 static Voice voice[BEETS_LANES];
 static uint32_t clock_phase;
+static void tick(void);
+static int external_clock;
+static unsigned midi_pulse;
+static void (*clock_send)(uint8_t);
+void engine_clock_output(void (*send)(uint8_t)) { clock_send = send; }
+void engine_external_clock(int enabled) { external_clock = !!enabled; }
+static void clock_out(uint8_t status) { if (!external_clock && clock_send) clock_send(status); }
+void engine_clock_pulse(void)
+{
+    if (!state.playing) return;
+    if (++midi_pulse == 12u) {
+        midi_pulse = 0;
+        state.step = (state.step + 1) & 7;
+        tick();
+    }
+    clock_phase = midi_pulse * (CLOCK_LIMIT / 12u);
+}
+void engine_continue(void)
+{
+    if (state.playing) return;
+    state.playing = 1;
+    clock_out(0xfbu);
+}
+
 
 static int bound(int n, int lo, int hi) { return n < lo ? lo : n > hi ? hi : n; }
 static int valid(int lane) { return lane >= 0 && lane < BEETS_LANES; }
@@ -126,7 +150,7 @@ void engine_init(uint32_t seed)
     state = (BeetsState){0};
     for (lane = 0; lane < BEETS_LANES; lane++) voice[lane] = (Voice){0};
     state.tempo = 160; state.blend = 50; state.rng = seed ? seed : 0xBE375123u;
-    clock_phase = 0;
+    clock_phase = 0; midi_pulse = 0; external_clock = 0; clock_send = 0;
     for (lane = 0; lane < BEETS_LANES; lane++) {
         BeetsLaneState *s = &state.lane[lane];
         s->loop = lane; s->slice = 0; s->queued_loop = s->queued_slice = -1;
@@ -145,12 +169,16 @@ void engine_play(int on)
     if (!on) for (lane = 0; lane < BEETS_LANES; lane++) voice[lane].audition = 0;
     if (on == state.playing) return;
     state.playing = on;
-    if (on) { state.step = 0; clock_phase = 0; tick(); }
+    if (on) {
+        state.step = 0; clock_phase = 0; midi_pulse = 0; tick();
+        clock_out(0xfau); clock_out(0xf8u);
+    } else clock_out(0xfcu);
     for (lane = 0; lane < BEETS_LANES; lane++) voice[lane].audition = 0;
 }
 void engine_panic(void)
 {
     int lane;
+    if (state.playing) clock_out(0xfcu);
     state.playing = 0;
     for (lane = 0; lane < BEETS_LANES; lane++) {
         voice[lane].audition = 0;
@@ -279,10 +307,22 @@ void engine_render(int32_t *lr, uint32_t frames, uint32_t master_q12)
         state.frames++;
         if (state.playing) {
             clock_phase += (uint32_t)state.tempo * 2u;
-            if (clock_phase >= CLOCK_LIMIT) {
-                clock_phase -= CLOCK_LIMIT;
-                state.step = (state.step + 1) & 7;
-                tick();
+            if (external_clock) {
+                /* Interpolate the display between pulses; only incoming MIDI
+                 * advances the sequencer. Never run ahead into another eighth. */
+                uint32_t limit = (midi_pulse + 1u) * (CLOCK_LIMIT / 12u);
+                if (clock_phase >= limit) clock_phase = limit - 1u;
+            } else {
+                if (clock_phase >= CLOCK_LIMIT) {
+                    clock_phase -= CLOCK_LIMIT;
+                    state.step = (state.step + 1) & 7;
+                    tick();
+                    midi_pulse = 0;
+                    clock_out(0xf8u);
+                } else if (clock_phase >= (midi_pulse + 1u) * (CLOCK_LIMIT / 12u)) {
+                    midi_pulse++;
+                    clock_out(0xf8u);
+                }
             }
         }
     }

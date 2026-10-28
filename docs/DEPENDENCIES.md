@@ -71,3 +71,13 @@ revisions. Rebase the telemetry patch if necessary; build firmware/native/WASM,
 run the tests, and test USB on the device. Commit the new gitlink and any patch
 changes together. Keep commits referenced by the gitlink available at the URL in
 `.gitmodules`; do not point collaborators at a local-only commit.
+
+## Current platform revision
+
+Beets 0.3.0 pins fm1-base `4587fda7eac415da41d0012a99a32dc6af600245`
+with BSP `2cd696a2b94341077303e9132bb4be3d0a87ebcf`. This update brings MIDI
+source-mask routing, corrected load measurement, a fine timer, optimized memory
+operations, CPU clock normalization, installer discovery fixes and dim browser LEDs.
+The telemetry patch was rebased onto the updated unity build. Optional USB host
+and BLE features remain disabled. All three targets were rebuilt and USB MIDI
+was tested on the physical FM1.
