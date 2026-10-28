@@ -14,6 +14,19 @@ cc -std=c99 -Wall -Wextra -Werror -O1 -g \
   -Iapp/dsp -Iapp/build/gen tests/engine_test.c app/dsp/engine.c \
   -o app/build/tests/engine-test
 app/build/tests/engine-test | tee app/build/tests/engine.log
-app/build/host/beets_host app/tests/basic.txt app/build/tests/host | tee app/build/tests/host.log
+cc -std=c99 -Wall -Wextra -Werror -O1 -g \
+  -fsanitize=address,undefined -fno-omit-frame-pointer \
+  -Iapp -Ifm1-base/include tests/telemetry_transport_test.c \
+  app/telemetry_stream.c app/telemetry.c app/vendor/jems/jems.c \
+  -o app/build/tests/telemetry-transport-test
+app/build/tests/telemetry-transport-test | tee app/build/tests/telemetry-transport.log
+cc -std=c99 -Wall -Wextra -Werror -O1 -g \
+  -fsanitize=address,undefined -fno-omit-frame-pointer \
+  -Iapp -Iapp/build/gen tests/telemetry_playback_test.c app/dsp/engine.c \
+  -o app/build/tests/telemetry-playback-test
+app/build/tests/telemetry-playback-test
+.venv/bin/python tests/telemetry_serializer_test.py | tee app/build/tests/telemetry-serializer.log
+FM1B_SYSEX_LOG="$PWD/app/build/tests/host-telemetry.syx" app/build/host/beets_host app/tests/basic.txt app/build/tests/host | tee app/build/tests/host.log
+.venv/bin/python tests/telemetry_host_capture.py app/build/tests/host-telemetry.syx | tee app/build/tests/telemetry-host.log
 node tests/wasm-smoke.mjs | tee app/build/tests/wasm.log
 printf 'All Beets tests passed. Evidence: app/build/tests/\n'

@@ -7,6 +7,8 @@
 #define APP_NAME "BEETS"
 #define APP_SPLASH_RGB RGB(220, 238, 110)
 #define APP_BLOCK 256u
+/* Room for an entire bounded telemetry SysEx; atomic nonblocking enqueue. */
+#define SXQ 1024u
 #define APP_CANVAS_PX (240u * 64u)
 enum { OBJ_SETTINGS, OBJ_PANEL, OBJ_NOBJ };
 #define APP_STORE_MAP {0xFC000u, 0xDC000u}
@@ -19,3 +21,6 @@ void app_input_only(void);
 void app_say(const char *a, const char *b);
 #define APP_HOST_EXPECT
 int app_expect(const char *what, int *got);
+
+#define APP_LOOP
+void app_loop(void);

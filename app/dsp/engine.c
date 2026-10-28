@@ -287,3 +287,36 @@ void engine_render(int32_t *lr, uint32_t frames, uint32_t master_q12)
         }
     }
 }
+
+uint32_t engine_clock_phase(void) { return clock_phase; }
+
+static uint32_t engine_ppm(float value, float maximum)
+{
+    float scaled;
+    if (value <= 0.0f || maximum <= 0.0f) return 0;
+    if (value >= maximum) return 1000000u;
+    scaled = value * (1000000.0f / maximum);
+    return (uint32_t)scaled;
+}
+void engine_playback_snapshot(BeetsPlaybackState out[BEETS_LANES])
+{
+    int lane;
+    if (!out) return;
+    for (lane = 0; lane < BEETS_LANES; lane++) {
+        const Voice *v = &voice[lane];
+        float length = (float)beets_samples[v->sample_index].frames;
+        float end = v->end > v->from ? v->end : length;
+        float position = v->position;
+        if (position < v->from) position += end - v->from;
+        if (position >= end) position -= end - v->from;
+        out[lane].sounding_loop = v->sample_index;
+        out[lane].direction = v->direction;
+        out[lane].active = state.playing || v->audition;
+        out[lane].tail_active = !out[lane].active && v->gain > 0.00001f;
+        out[lane].position_ppm = engine_ppm(position, length);
+        out[lane].audition_remaining = v->audition;
+        out[lane].window_start_ppm = engine_ppm(v->from, length);
+        out[lane].window_end_ppm = engine_ppm(end, length);
+        out[lane].gain_ppm = engine_ppm(v->gain, 1.0f);
+    }
+}

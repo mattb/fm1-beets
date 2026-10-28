@@ -99,3 +99,22 @@ This is a port of the Norns instrument, not a Norns runtime. It does not include
 Softcut, Norns sample loading/edit pages, crow integration or arc hardware support.
 Physical device boot, controls, audio load and USB behavior require an FM-1 test;
 compilation and simulator checks alone do not establish them.
+
+## USB MIDI visualizer feed
+
+Firmware 0.2.0 emits ASCII JSON in versioned SysEx over class-compliant USB MIDI:
+full state at sixteenth-note boundaries, input edges/deltas, and stopped heartbeats.
+See [the protocol and TouchOSC receiver example](docs/TELEMETRY.md).
+
+```sh
+.venv/bin/python tools/monitor-midi.py --list
+.venv/bin/python tools/monitor-midi.py --port 'X0X FM-1'
+# Connected-device smoke test; temporarily operates transport and panel controls:
+.venv/bin/python tools/smoke-usb-midi.py --port 'X0X FM-1'
+```
+
+The monitor and hardware test require `mido` and `python-rtmidi`. The build wrapper
+applies `patches/fm1-base-telemetry.patch` idempotently to the pinned upstream
+submodule for atomic nonblocking SysEx output; the submodule therefore appears
+modified after setup. The bounded JSON serializer is vendored MIT-licensed
+[jems](app/vendor/jems/PROVENANCE.md), with ASCII Unicode escaping adaptations.

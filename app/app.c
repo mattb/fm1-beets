@@ -3,11 +3,14 @@
  * Beets control/display integration adapted from fm1-base's template.
  * Musical engine: dsp/engine.c, derived from Matt Biddulph's MIT Beets. */
 #include "dsp/engine.h"
+#include "telemetry_stream.h"
 #define BEETS_SAVE_MAGIC 0x42545332u
 static const uint8_t beets_white[16] = PLAT_WHITE_KEYS;
 static const uint8_t beets_black[11] = PLAT_BLACK_KEYS;
 static struct {
     uint32_t keys, buttons, msg_until, last_draw;
+    uint32_t lights_buttons, lights_keys, dim_buttons, dim_keys;
+    uint32_t telemetry_master, telemetry_master_ms;
     int focus, dirty, reverse_deck, stutter_deck;
     char message[48];
     BeetsState state;
@@ -30,6 +33,7 @@ void app_say(const char *a, const char *b)
     while (b && *b && i < 47) beets_ui.message[i++] = *b++;
     beets_ui.message[i] = 0;
     beets_ui.msg_until = plat_ms() + 1400;
+    beets_stream_changed();
     if (ann_on()) ann_say(beets_ui.message, 0, ANN_NOW);
 }
 static void beets_restore(const BeetsSave *s)
@@ -51,6 +55,7 @@ void app_init(void)
     memset(&beets_ui, 0, sizeof beets_ui);
     beets_ui.reverse_deck = beets_ui.stutter_deck = -1;
     engine_init(0xBE375u);
+    beets_stream_init();
     if (plat_store_load(OBJ_SETTINGS, &saved, sizeof saved) == (int)sizeof saved && saved.magic == BEETS_SAVE_MAGIC)
         beets_restore(&saved);
     beets_snapshot();
@@ -104,6 +109,8 @@ static void beets_lights(void)
     if (s->lane[beets_ui.focus].auto_next) bright |= 1u << B_SEQ;
     if (s->lane[beets_ui.focus].first == s->lane[beets_ui.focus].last) bright |= 1u << B_LFO;
     if (beets_ui.dirty) bright |= 1u << B_SAVE;
+    beets_ui.lights_buttons = bright; beets_ui.lights_keys = keys;
+    beets_ui.dim_buttons = dim; beets_ui.dim_keys = kd;
     plat_lights(bright, keys, dim, kd, 1);
 }
 static void beets_input(void)
@@ -111,6 +118,10 @@ static void beets_input(void)
     uint32_t keys = plat_keys(), btn = plat_buttons(), down = btn & ~beets_ui.buttons, fresh = keys & ~beets_ui.keys;
     int d, i, e, knob = -1, save = 0, edit = (btn >> B_EDIT) & 1u;
     char msg[48] = ""; uint32_t irq;
+    BeetsTelemetryInput input = {0};
+    input.ms = plat_ms();
+    input.keys_down = fresh; input.keys_up = beets_ui.keys & ~keys;
+    input.buttons_down = down; input.buttons_up = beets_ui.buttons & ~btn;
     beets_snapshot();
     irq = plat_lock();
     if (down & (1u << B_OCTDN)) { beets_ui.focus = 0; beets_cat(msg, "FOCUS DECK A"); }
@@ -168,6 +179,7 @@ static void beets_input(void)
     for (i = 0; i < NE; i++) if ((e = plat_enc(i)) != 0) {
         int p = i == EN_ALGO ? BEETS_SWITCH : i - EN_K1;
         knob = i;
+        input.enc[i] = e;
         if (i == EN_SELECT) engine_tempo(beets_ui.state.tempo + e);
         else if (i == EN_PRESET) engine_blend(beets_ui.state.blend + e);
         else if (p >= 0 && p < 5) engine_probability(d, p, beets_ui.state.lane[d].probability[p] + e * 5);
@@ -201,6 +213,8 @@ static void beets_input(void)
         beets_ui.message[0] = 0; beets_cat(beets_ui.message, msg); beets_ui.msg_until = plat_ms() + 1400;
         ann_later(msg, ANN_NOW, 140, plat_ms());
     }
+    if (input.keys_down || input.keys_up || input.buttons_down || input.buttons_up || knob >= 0)
+        beets_stream_input(&input);
     if (save) beets_save();
     beets_lights();
 }
@@ -328,3 +342,31 @@ int app_expect(const char *what, int *got)
     return 1;
 }
 #endif
+
+/* Fresh coherent engine snapshot, outside render/interrupt context. */
+void app_loop(void)
+{
+    BeetsState snapshot;
+    BeetsTelemetryUI ui = {0};
+    uint32_t now = plat_ms(), irq = plat_lock();
+    engine_snapshot(&snapshot);
+    ui.clock_phase = engine_clock_phase();
+    engine_playback_snapshot(ui.playback);
+    plat_unlock(irq);
+    ui.focus = beets_ui.focus; ui.dirty = beets_ui.dirty;
+    ui.keys = beets_ui.keys; ui.buttons = beets_ui.buttons;
+    ui.master = plat_master(); ui.frame_ms = beets_ui.last_draw;
+    /* Pot jitter must not turn a stopped instrument into a telemetry flood. */
+    if (now - beets_ui.telemetry_master_ms >= 50u &&
+        (ui.master > beets_ui.telemetry_master + 16u || beets_ui.telemetry_master > ui.master + 16u)) {
+        beets_ui.telemetry_master = ui.master; beets_ui.telemetry_master_ms = now;
+        beets_stream_changed();
+    }
+    ui.lights_buttons = beets_ui.lights_buttons; ui.lights_keys = beets_ui.lights_keys;
+    ui.dim_buttons = beets_ui.dim_buttons; ui.dim_keys = beets_ui.dim_keys;
+    if ((int32_t)(beets_ui.msg_until - now) > 0) {
+        ui.message_remaining_ms = beets_ui.msg_until - now;
+        memcpy(ui.message, beets_ui.message, sizeof ui.message);
+    }
+    beets_stream_poll(&snapshot, &ui, now);
+}

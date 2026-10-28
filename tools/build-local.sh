@@ -5,6 +5,7 @@ export JIELI_TOOLCHAIN="${JIELI_TOOLCHAIN:-$HOME/.jieli/toolchain}"
 export AC79_SDK="${AC79_SDK:-$HOME/.jieli/fw-AC79_AIoT_SDK}"
 export PATH="/opt/homebrew/bin:$PATH"
 cd "$ROOT"
+"$ROOT/tools/patch-base.sh"
 if [ "${1:-}" = "--all" ]; then
     shift
     "$ROOT/.venv/bin/python" "$ROOT/fm1-base/tools/build.py" "$ROOT/app" --host "$@"

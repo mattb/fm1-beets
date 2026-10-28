@@ -39,3 +39,16 @@ void engine_force(int lane, int reverse, int stutter);
 void engine_masks(int lane, uint32_t slice_mask, uint32_t loop_mask);
 void engine_auto(int lane, int on);
 const char *engine_loop_name(int loop);
+
+/* Capture under the same lock as engine_snapshot; not persisted. */
+uint32_t engine_clock_phase(void);
+
+/* Transient render position, deliberately separate from persisted BeetsState.
+ * PPM fields normalize source-sample coordinates to 0..1000000. active is
+ * transport/audition scheduling, even when muted; gain_ppm is the actual
+ * smoothed mute envelope. tail_active identifies the short post-stop release. */
+typedef struct {
+    int sounding_loop, direction, active, tail_active;
+    uint32_t position_ppm, audition_remaining, window_start_ppm, window_end_ppm, gain_ppm;
+} BeetsPlaybackState;
+void engine_playback_snapshot(BeetsPlaybackState out[BEETS_LANES]);
