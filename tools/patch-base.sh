@@ -1,13 +1,18 @@
 #!/bin/sh
-# Reproducible platform extension on the pinned upstream submodule.
+# Explicitly apply our platform extension; never overwrite conflicting edits.
 set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-PATCH="$ROOT/patches/fm1-base-telemetry.patch"
-if git -C "$ROOT/fm1-base" apply --reverse --check "$PATCH" 2>/dev/null; then
-    exit 0
-fi
-if ! git -C "$ROOT/fm1-base" apply --check "$PATCH"; then
-    echo 'fm1-base telemetry patch conflicts with local changes; nothing was overwritten.' >&2
-    exit 1
-fi
-git -C "$ROOT/fm1-base" apply "$PATCH"
+if [ "$#" -gt 1 ]; then echo 'usage: tools/patch-base.sh [BASE_DIRECTORY]' >&2; exit 2; fi
+BASE=$(CDPATH= cd -- "${1:-${FM1_BASE:-$ROOT/fm1-base}}" && pwd)
+# Preflight every missing patch before modifying anything.
+for PATCH in "$ROOT"/patches/fm1-base-*.patch; do
+    if git -C "$BASE" apply --reverse --check "$PATCH" 2>/dev/null; then continue; fi
+    if ! git -C "$BASE" apply --check "$PATCH"; then
+        echo "fm1-base patch conflicts: $PATCH; nothing was overwritten." >&2
+        exit 1
+    fi
+done
+for PATCH in "$ROOT"/patches/fm1-base-*.patch; do
+    if git -C "$BASE" apply --reverse --check "$PATCH" 2>/dev/null; then continue; fi
+    git -C "$BASE" apply "$PATCH"
+done

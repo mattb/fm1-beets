@@ -35,7 +35,10 @@ control command back: that creates feedback loops.
 ## 2. Make the firmware project reproducible
 
 Keep the instrument in its own repository, with a pinned `fm1-base` submodule.
-Own your engine, UI, assets, tests and build wrapper in the instrument repository.
+Use an explicit path override for shared development checkouts; Beets supports
+`FM1_BASE` without silently modifying the external dependency (see
+[dependency setup](DEPENDENCIES.md)). Own your engine, UI, assets, tests and build
+wrapper in the instrument repository.
 Avoid copying the platform wholesale or scattering app-specific behavior into it.
 
 Beets adds a small platform extension for whole-frame, nonblocking SysEx output.

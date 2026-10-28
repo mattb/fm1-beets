@@ -1,0 +1,21 @@
+diff --git a/tools/build.py b/tools/build.py
+index 682ea77..facc2dd 100755
+--- a/tools/build.py
++++ b/tools/build.py
+@@ -178,12 +178,14 @@ def _builder_start():
+     global _BUILDER
+     if _BUILDER:
+         return _BUILDER
+-    name = "jieli-" + hashlib.sha1(str(ROOT).encode()).hexdigest()[:10]
++    name = "jieli-" + hashlib.sha1(("split-mount-v1:" + str(SRC) + ":" + str(APP)).encode()).hexdigest()[:10]
+     st = subprocess.run(["docker", "inspect", "-f", "{{.State.Running}}", name], capture_output=True, text=True)
+     if st.stdout.strip() != "true":
+         subprocess.run(["docker", "rm", "-f", name], capture_output=True)
+         r = subprocess.run(["docker", "run", "-d", "--rm", "--name", name, "--platform", "linux/amd64",
+-                            "-v", f"{ROOT}:/work", "-v", f"{toolchain()}:/opt/jieli:ro", "-w", "/work",
++                            "-v", f"{SRC}:/work/{SRC.relative_to(ROOT)}:ro",
++                            "-v", f"{APP}:/work/{APP.relative_to(ROOT)}",
++                            "-v", f"{toolchain()}:/opt/jieli:ro", "-w", "/work",
+                             DOCKER_IMAGE, "sh", "-c", "sleep 3600"], capture_output=True, text=True)
+         if r.returncode:
+             sys.stderr.write(r.stderr)

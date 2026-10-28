@@ -12,7 +12,6 @@ fidelity tradeoff to fit the FM-1's internal flash.
 ## Build and play
 
 ```sh
-git submodule update --init --recursive
 tools/setup-local.sh
 tools/build-local.sh --all
 tools/serve-local.sh
@@ -82,6 +81,13 @@ Browser shortcuts work while the panel is focused: `P` transport, `Z`/`X` focus,
 `QWERTYUI` A slices, `ASDFGHJK` B slices, `1…0` loop selection, `Esc` full range.
 Drag or scroll a knob, or focus it and use arrow keys. Shift-click can hold keys
 for range chords with one pointer.
+
+## Platform dependency
+
+`fm1-base` is a pinned Git reference, not vendored source. The wrappers initialize
+it automatically. Set `FM1_BASE=/path/to/fm1-base` to use a shared checkout instead;
+external checkouts are checked but never silently patched. See [dependency setup](docs/DEPENDENCIES.md)
+for the explicit patch step, shared-checkout workflow and upgrading the pin.
 
 ## Repository layout
 
