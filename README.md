@@ -127,3 +127,5 @@ applies `patches/fm1-base-telemetry.patch` idempotently to the pinned upstream
 submodule for atomic nonblocking SysEx output; the submodule therefore appears
 modified after setup. The bounded JSON serializer is vendored MIT-licensed
 [jems](app/vendor/jems/PROVENANCE.md), with ASCII Unicode escaping adaptations.
+
+See the [general Norns-to-FM1 porting guide](docs/NORNS-PORTING.md), with Beets as a worked example, and [measured telemetry performance](docs/TELEMETRY-PERFORMANCE.md).
