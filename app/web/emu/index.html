@@ -102,7 +102,7 @@ footer {display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font:
 </head>
 <body>
 <header>
-  <div><p class="eyebrow">FM-1 / TWO-DECK BREAK MACHINE</p><h1>{{NAME}}<span class="dot">.</span></h1></div><p class="intro">Keep the groove.<br>Change the odds.</p><span class="edition">01 / PLAYABLE PORT</span>
+  <div><p class="eyebrow">FM-1 / LOOP SLICER</p><h1>{{NAME}}<span class="dot">.</span></h1></div><p class="intro">Play two loops with<br>probability controls.</p><span class="edition">BROWSER VERSION</span>
 </header>
 <main>
 <div class="quickstart"><span class="step">01</span> Power on, then press <strong>PLAY</strong>.<span class="step">02</span> Tap a slice or turn <strong>REPEAT / SKIP</strong>.<span class="step">03</span> Unmute <strong>B</strong> to layer the second break.</div>
@@ -111,34 +111,34 @@ footer {display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font:
 <div class="devicebox">
 <div class="device" id="device">
   <svg id="panel" viewBox="0 0 1000 640" aria-hidden="true" focusable="false"></svg>
-  <canvas id="screen" width="240" height="240" role="img" aria-label="The FM-1's screen. Its text is read out: see Screen Reader, below the panel"></canvas>
+  <canvas id="screen" width="240" height="240" role="img" aria-label="The FM-1's screen. Its text is read out: see Screen reader, below the panel"></canvas>
   <div id="controls" role="group" aria-label="The FM-1's panel" aria-describedby="panel-keys" inert></div>
   <div class="start" id="start"><button type="button" id="go">Power on Beets</button></div>
 </div>
 </div>
 <p id="panel-keys" class="sr">Tab moves through the knobs, the buttons, the black keys and the white keys. Arrow keys turn a knob,
-  Page Up and Page Down faster. Space or Enter holds a button or key down while you hold it; Shift and Enter keeps it down
+  Page Up and Page Down turn it faster. Hold Space or Enter to hold a button or key. Shift+Enter latches it
   until you press it again (with a mouse: Shift-click or right-click).</p>
 
 <div class="bar">
-  <span id="status" role="status">Ready when you are. Power on, then PLAY.</span>
+  <span id="status" role="status">Power on, then press PLAY.</span>
   <span id="alert" role="alert"></span>
   <button id="mute" type="button" aria-pressed="false">Mute</button>
   <label class="keys"><input type="checkbox" id="shortcuts" checked> Keyboard shortcuts</label>
   <span class="cpu" id="cpu"></span>
   <button id="reset" type="button" aria-describedby="reset-why">Factory reset</button>
-  <span id="reset-why" class="sr">Forget what was saved and start again from the factory settings</span>
+  <span id="reset-why" class="sr">Clear saved settings and restore defaults</span>
 </div>
 
 <section class="playbook" aria-label="Playing Beets">
-<div><span class="eyebrow lane-a">DECK A / WHITE 1–8</span><h2>A break under each hand.</h2><p>The left eight white keys play A. The right eight play B. Tap to cue a slice; hold two keys on the same deck to set a range. HOME opens the full range again.</p></div>
-<div><span class="eyebrow lane-b">DECK B / WHITE 9–16</span><h2>One focus. No pages.</h2><p>OCT− selects A; OCT+ selects B for the knobs and loop keys. Your other hand can still play either deck. Black keys 1–10 select a break. SEL and GLO mute A and B.</p></div>
-<div><span class="eyebrow">FIVE KINDS OF ACCIDENT</span><h2>Turn chance into rhythm.</h2><p>REPEAT holds a slice, SKIP jumps ahead, REVERSE flips it, STUTTER chops it, SWITCH changes the loop. Each knob sets its probability. FX bypasses mutations without losing your settings.</p></div>
+<div><span class="eyebrow lane-a">DECK A / WHITE KEYS 1-8</span><h2>Play slices</h2><p>The left white keys play deck A; the right white keys play B. Tap a key to cue a slice. Hold two keys on one deck to select a range, then press HOME to restore the full range.</p></div>
+<div><span class="eyebrow lane-b">DECK B / WHITE KEYS 9-16</span><h2>Select a deck</h2><p>OCT- selects A and OCT+ selects B for editing. The knobs and black loop keys act on that deck. White keys keep their deck assignments. SEL mutes A; GLO mutes B.</p></div>
+<div><span class="eyebrow">PROBABILITIES</span><h2>Vary playback</h2><p>Turn a knob to set how often its effect occurs. REPEAT repeats a slice; SKIP advances an extra slice. REVERSE plays backwards, STUTTER loops a short segment, and SWITCH selects another loop. FX bypasses these effects while retaining their settings.</p></div>
 </section>
-<details class="guide"><summary>Performance controls &amp; keyboard shortcuts</summary><div class="guide-body"><p><b>Hold ENV</b> for reverse, <b>hold ARP</b> for stutter. <b>LFO</b> locks the current slice; <b>SEQ</b> advances loops automatically. Hold <b>EDIT</b> and tap white/black keys to change eligible slices/loops. Stop playback, then <b>SAVE</b> stores your setup.</p><p>With the panel focused: <kbd>P</kbd> play/stop · <kbd>Z</kbd>/<kbd>X</kbd> focus A/B · <kbd>Q W E R T Y U I</kbd> A slices · <kbd>A S D F G H J K</kbd> B slices · <kbd>1…0</kbd> loops · <kbd>Esc</kbd> full range. Drag knobs vertically, scroll, or focus and use arrow keys. Shift-click holds a key for one-handed range chords.</p></div></details>
-<footer><span>Original demo loops · vcvcvc_val</span><span>Beets by Matt Biddulph / fm1-base</span><span>22.05 kHz μ-law · shared firmware &amp; WASM engine</span></footer>
+<details class="guide"><summary>Controls and keyboard shortcuts</summary><div class="guide-body"><p><b>Hold ENV</b> for reverse, <b>hold ARP</b> for stutter. <b>LFO</b> locks the current slice; <b>SEQ</b> advances loops automatically. Hold <b>EDIT</b> and tap white/black keys to change eligible slices/loops. Stop playback, then <b>SAVE</b> stores your setup.</p><p>With the panel focused: <kbd>P</kbd> play/stop · <kbd>Z</kbd>/<kbd>X</kbd> focus A/B · <kbd>Q W E R T Y U I</kbd> A slices · <kbd>A S D F G H J K</kbd> B slices · <kbd>1-0</kbd> loops · <kbd>Esc</kbd> full range. Drag knobs vertically, scroll, or focus and use arrow keys. Shift-click holds a key for one-handed range chords.</p></div></details>
+<footer><span>Original demo loops · vcvcvc_val</span><span>Beets by Matt Biddulph / fm1-base</span></footer>
 <details class="speak" id="speak">
-  <summary><h2>Screen Reader</h2></summary>
+  <summary><h2>Screen reader</h2></summary>
   <fieldset>
     <legend>Output</legend>
     <label><input type="radio" name="speak" value="sr" checked> System screen reader</label>
@@ -148,7 +148,7 @@ footer {display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font:
   <p id="said" aria-hidden="true"></p>
   <div class="row">
     <button type="button" id="where" disabled>Read whole screen</button>
-    <button type="button" id="again" disabled>Repeat last</button>
+    <button type="button" id="again" disabled>Repeat last message</button>
   </div>
 </details>
 <!-- what the screen says, for the computer's screen reader -->
@@ -660,8 +660,8 @@ function showAlert(t) { $("alert").textContent = t; }
 async function switchOn() {
   const go = $("go");
   go.disabled = true;
-  go.textContent = "Starting…";
-  status.textContent = "Starting…";
+  go.textContent = "Starting...";
+  status.textContent = "Starting...";
   try {
     const ac = new AudioContext({ sampleRate: 44100, latencyHint: "interactive" });
     if (speakMode() === "voice") voiceOn();
@@ -702,9 +702,9 @@ async function switchOn() {
   } catch (err) {
     node = null;
     go.disabled = false;
-    go.textContent = "Switch on";
+    go.textContent = "Power on Beets";
     status.textContent = "Off.";
-    showAlert("Could not start: " + (err && err.message || err) + ". Chrome, Edge, Firefox and Safari should all work.");
+    showAlert("Could not start: " + (err && err.message || err) + ". Check browser audio support and reload to try again.");
   }
 }
 $("go").addEventListener("click", switchOn);
@@ -719,7 +719,7 @@ $("reset").addEventListener("click", () => {
     location.reload();
   } else {
     $("reset").dataset.armed = "1";
-    $("reset").textContent = "Press again to forget everything";
+    $("reset").textContent = "Press again to clear saved settings";
   }
 });
 </script>

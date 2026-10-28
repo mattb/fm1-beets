@@ -1,12 +1,8 @@
 # Beets USB MIDI telemetry, version 1
 
-For architecture, integration and testing guidance, read [the adoption guide](TELEMETRY-BEST-PRACTICES.md). This document is the Beets v1 wire reference.
-
 Beets publishes its instrument and panel state as ASCII JSON inside SysEx on its
-class-compliant USB MIDI connection. This is a read-only visualizer feed: this
-protocol defines **no incoming control commands**. A receiver can draw both decks,
-playheads, probabilities, held controls, and status messages without reproducing
-the FM1's 240×240 screen. A receive-only TouchOSC prototype is included at `touchosc/Beets.tosc`; see `touchosc/README.md`.
+class-compliant USB MIDI connection. The feed is read-only. A receiver can draw both decks,
+playheads, probabilities, held controls and status messages in its own layout. A receive-only TouchOSC prototype is included at `touchosc/Beets.tosc`; see `touchosc/README.md`.
 
 ## Wire format
 
@@ -19,11 +15,10 @@ F0 7D 42 45 45 54 53 01 <ASCII JSON> F7
    non-commercial / experimental ID
 ```
 
-The version byte is binary `01`, not the character `1`. `7D` is an experimental
-namespace, not a Beets manufacturer allocation; match the entire signature.
-JSON bytes are printable ASCII (`20`–`7E`); strings use JSON escapes for control
-characters and non-ASCII text. There is **no LF, NUL, or length prefix on the
-wire**. The current maximum complete frame is 3072 bytes. The serializer uses
+The version byte is `0x01`. The development manufacturer ID `7D` is shared, so
+receivers must match the entire signature.
+JSON bytes are printable ASCII (`20`-`7E`); strings use JSON escapes for control
+characters and non-ASCII text. The payload has no LF, NUL or length prefix. The current maximum complete frame is 3072 bytes. The serializer uses
 vendored jems, a bounded buffer, and no allocation. If serialization fails, no
 partial message is sent. The MIDI transport accepts a whole frame or defers it.
 
@@ -44,13 +39,12 @@ press/release edges and encoder deltas. Inputs use a 32-entry FIFO; a state
 snapshot takes priority after 100 ms so sustained input cannot starve it.
 Serialization and USB output run outside the audio interrupt. Due checks run at most once per device millisecond; full state is captured only when needed. A failed send delays the next attempt by 20 ms. See [hardware performance measurements](TELEMETRY-PERFORMANCE.md).
 
-This is best-effort telemetry, not a sample-accurate event log. Backpressure holds
+Main-loop timing and USB capacity determine when updates arrive. Backpressure holds
 queued inputs and coalesces snapshots. FIFO overflow and stale queued inputs
 purged on disconnect increase `ui.input_dropped`; inputs while disconnected are
 not recorded. Timing guarantees depend on the transport accepting a frame.
-Receivers should use snapshots as authoritative, with input messages only for
-short-lived gestures/animation. Do not reconstruct instrument state by replaying
-input messages: the firmware remains the source of truth.
+Receivers should reconstruct state from snapshots and use input messages for
+gesture animation.
 
 `seq` is a shared unsigned 32-bit sequence for both message types, incremented
 when a frame is accepted for transmission. A blocked attempt does not consume a
@@ -72,8 +66,8 @@ Both message types contain `v:1`, `type`, `seq`, and `ms`.
 
 | Field | Meaning |
 | --- | --- |
-| `tempo`, `blend`, `playing` | BPM (60–220), deck B mix percentage (0–100), transport flag. |
-| `step` | Current eighth-note step, 0–7. |
+| `tempo`, `blend`, `playing` | BPM (60-220), deck B mix percentage (0-100), transport flag. |
+| `step` | Current eighth-note step, 0-7. |
 | `frames` | Total rendered stereo sample frames, including stopped time; uint32 wraps. |
 | `ticks` | Cumulative eighth-note triggers; uint32 wraps. Start triggers an eighth immediately. |
 | `rng` | Engine's current random-generator state; diagnostic, not a UI control. |
@@ -83,8 +77,7 @@ Both message types contain `v:1`, `type`, `seq`, and `ms`.
 | `ui` | Panel/display state, described below. |
 
 The normalized eighth phase is `clock_phase / 2646000`; its first/second half
-corresponds to the two sixteenths. This is audio-engine time, not host wall time
-or MIDI Clock. Transport start resets the phase and `step`; `ticks` is cumulative.
+corresponds to the two sixteenths. The audio engine supplies this clock independently of host wall time and MIDI Clock. Transport start resets the phase and `step`; `ticks` is cumulative.
 A visualizer may interpolate between snapshots using tempo while playing, then
 resynchronize on each snapshot. Do not advance the phase while stopped.
 
@@ -93,21 +86,21 @@ Each `lanes` object contains:
 | Field | Meaning |
 | --- | --- |
 | `lane`, `name` | 0 / `"A"`, or 1 / `"B"`. |
-| `loop`, `loop_name` | Current loop ID 0–9 and display name (`BEETS 1`…`BEETS 8`, `AMEN 1`, `AMEN 2`). |
+| `loop`, `loop_name` | Current loop ID 0-9 and display name (`BEETS 1`...`BEETS 8`, `AMEN 1`, `AMEN 2`). |
 | `queued_loop`, `queued_loop_name` | Pending loop selection; `-1` and `""` mean none. |
-| `slice`, `queued_slice` | Current/pending slice 0–7; queued `-1` means none. |
-| `first`, `last` | Inclusive selected slice range, each 0–7. |
+| `slice`, `queued_slice` | Current/pending slice 0-7; queued `-1` means none. |
+| `first`, `last` | Inclusive selected slice range, each 0-7. |
 | `muted`, `bypass`, `auto_next` | Deck mute, probability bypass, automatic next-loop flags. |
 | `force_reverse`, `force_stutter` | Held performance effects; distinct from saved probabilities. |
 | `loop_mask`, `slice_mask` | Eligibility bitsets: bit N selects loop/slice N. |
 | `events` | Mutation flags for the current trigger: bits 0 repeat, 1 skip, 2 reverse, 3 stutter, 4 switch. |
-| `probability` | Object with `repeat`, `skip`, `reverse`, `stutter`, `switch`, each 0–100. |
+| `probability` | Object with `repeat`, `skip`, `reverse`, `stutter`, `switch`, each 0-100. |
 
 Each `playheads` object contains `lane`, `sounding_loop`,
 `sounding_loop_name`, `position_ppm`, `direction` (+1/-1), `active`, `tail_active`,
 `audition_remaining`, `window_start_ppm`, `window_end_ppm`, and `gain_ppm`.
 Positions and window bounds are normalized to the entire source sample:
-0–1000000 represents 0–100%. `gain_ppm` is the actual smoothed mute envelope
+0-1000000 represents 0-100%. `gain_ppm` is the actual smoothed mute envelope
 on the same millionths scale. `active` means transport running or audition frames
 remaining; a muted deck can therefore be active with zero gain. `tail_active`
 indicates an inactive voice with a remaining release envelope. Audition duration
@@ -123,7 +116,7 @@ for sample-position animation; use `lanes` for selected controls and sequencing.
 | `keys`, `buttons` | Current held physical-control bitsets. |
 | `frame_ms` | UI animation time in milliseconds. |
 | `message`, `message_remaining_ms` | Temporary status text and remaining display duration. |
-| `master` | Master level, 0–4096. |
+| `master` | Master level, 0-4096. |
 | `lights_buttons`, `lights_keys` | Lit physical LED bitsets. |
 | `dim_buttons`, `dim_keys` | Dim physical LED bitsets. |
 | `input_dropped` | Cumulative discarded queued input records, uint32. |
@@ -132,14 +125,14 @@ for sample-position animation; use `lanes` for selected controls and sequencing.
 
 `type:"input"` contains `keys_down`, `keys_up`, `buttons_down`, `buttons_up`
 (bitsets), and `enc` (seven signed encoder deltas). Several changes can be present
-in one record. An edge describes physical input observed by the main loop, not
-the moment a quantized cue becomes audible. A snapshot reflects engine state.
+in one record. An edge records input as observed by the main loop. A quantized cue can become
+audible later; snapshots report the resulting engine state.
 
 Encoder array order is `SELECT, ALGO, PRESET, K1, K2, K3, K4`. In Beets these are
 tempo, switch probability, blend, repeat, skip, reverse, and stutter.
 
-Button bit positions 0–13 are `FX, SEL, ENV, LFO, EDIT, GLO, HOME, SAVE, ARP, SEQ,
-PLAY, REC, OCT−, OCT+`. Button-light bit 14 is the green PLAY indicator and is not
+Button bit positions 0-13 are `FX, SEL, ENV, LFO, EDIT, GLO, HOME, SAVE, ARP, SEQ,
+PLAY, REC, OCT-, OCT+`. Button-light bit 14 is the green PLAY indicator and is not
 an additional input button. Physical key bit positions are chromatic: white keys
 left to right are `[0,2,4,6,7,9,11,12,14,16,18,19,21,23,24,26]`; black keys are
 `[1,3,5,8,10,13,15,17,20,22,25]`. The first eight whites address A and the next
@@ -160,8 +153,7 @@ unique case-insensitive substring. Without it, the receiver selects a unique
 Beets-named input or the sole available input. It refuses ambiguous selection.
 The receiver opens only an input port. It filters and validates Beets v1 framing,
 printable ASCII, strict JSON, type/version, and unsigned `seq`/`ms`; it is not a
-complete schema validator. Valid objects go to stdout, one per line. **Those
-newlines are added by the receiver, not transmitted by firmware.** Diagnostics
+complete schema validator. The receiver writes valid objects to stdout and adds a newline after each. Diagnostics
 go to stderr. `--list` prints port names instead of JSONL.
 
 `--count 0` and `--timeout 0` mean unlimited. Timeout is an overall capture limit,
@@ -173,8 +165,7 @@ receiver after a device disconnect; it does not auto-reconnect.
 The local build wrapper applies `patches/fm1-base-telemetry.patch` to the pinned
 upstream base to provide atomic, nonblocking SysEx output and MIDI-ring guards.
 For host-only integration capture, run the native app with
-`FM1B_SYSEX_LOG=/absolute/path/capture.syx`; this file contains concatenated raw
-SysEx frames, not JSONL. Split on complete `F0`…`F7` frames and remove those two
+`FM1B_SYSEX_LOG=/absolute/path/capture.syx`; this file contains concatenated raw SysEx frames. Split on complete `F0`...`F7` frames and remove those two
 bytes before passing each payload to `parse_payload` in the monitor module.
 This host log validates application output independently of USB hardware.
 
@@ -195,7 +186,7 @@ translation. [TouchOSC callback manual](https://hexler.net/touchosc/manual/compl
 
 Enable a TouchOSC MIDI connection and choose the FM1's port as Receive Port. Leave
 Send Port unset for a receive-only layout. [TouchOSC MIDI connections](https://hexler.net/touchosc/manual/connections-midi).
-This document-root script is a starting receiver, not a finished layout:
+This document-root example stores decoded state for a layout to use:
 
 ```lua
 local state = nil
@@ -248,5 +239,6 @@ the test. Raw SysEx, JSONL and a result summary go to `build/tests/usb-telemetry
 On 2026-10-28, the physical FM1 running `FM-1_731000200` passed: 139 state frames,
 6 input frames, maximum 1486-byte frame, zero sequence gaps, no new input drops,
 and 8 separate remote acknowledgements. Firmware/native/WASM builds and the
-full automated suite also passed. This verifies the USB feed and engine state;
-it is not an audio-quality measurement or an iPad/TouchOSC execution test.
+full automated suite also passed. This run checked the USB feed and engine state. Audio quality and iPad/TouchOSC
+execution require separate tests. See the [current verification record](VERIFICATION.md)
+for later results and the [integration guide](TELEMETRY-BEST-PRACTICES.md) for adoption.

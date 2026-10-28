@@ -1,17 +1,19 @@
 # Beets for FM-1
 
-Two synchronized loop decks, eight slices each, and five ways to change the groove.
-A C port of [Matt Biddulph's Beets](https://github.com/mattb/beets), built on
-[fm1-base](https://github.com/charlesvestal/fm1-base).
+Beets is a sample slicer for FM-1, ported from
+[Matt Biddulph's Norns app](https://github.com/mattb/beets) using
+[fm1-base](https://github.com/charlesvestal/fm1-base). Each deck plays eight slices
+from a loop. Repeat, skip, reverse, stutter and loop-switch probabilities change
+the sequence as it plays.
 
 The hardware firmware, native simulator and browser emulator run the same engine
 and the same ten demo loops. Original recordings are preserved in `assets/source/`.
-The generated embedded bank uses mono 22.05 kHz μ-law with interpolation, a deliberate
-fidelity tradeoff to fit the FM-1's internal flash.
+The samples are converted to mono 22.05 kHz mu-law to fit internal flash, then
+interpolated during playback. This conversion reduces audio fidelity.
 
 ![Beets running in Chrome: Amen on deck A, deck B focused with a slice range selected](docs/images/beets-web.jpg)
 
-*The actual WASM app running in Chrome during the browser smoke test.*
+*The WASM app running in Chrome during a smoke test.*
 
 ## Build and play
 
@@ -32,15 +34,14 @@ tools/build-local.sh --web     # app/build/emu/
 tools/build-local.sh           # app/build/beets.fwsc
 ```
 
-On this Mac, the wrapper uses `.venv` and the existing JieLi toolchain/SDK under
+The wrapper uses `.venv` and the existing JieLi toolchain/SDK under
 `~/.jieli`. Firmware compilation requires Docker Desktop running. Host and WASM
 builds do not need Docker. The compiler and SDK are not Git dependencies.
 
 Required tools: C compiler, Python 3.14 + Pillow 13, ffmpeg, Emscripten, and for
 firmware the JieLi pi32v2 Linux compiler plus AC79 SDK
 `AC79NN_SDK_V1.2.1_2023-12-13`. `tools/setup-local.sh` initializes submodules and
-the Python environment; install the other tools separately. On this machine these
-were installed and verified during the base setup.
+the Python environment; install the other tools separately.
 
 ```sh
 brew install emscripten ffmpeg
@@ -50,21 +51,20 @@ git clone --depth 1 --branch AC79NN_SDK_V1.2.1_2023-12-13 \
 ```
 
 `JIELI_TOOLCHAIN` and `AC79_SDK` can override the wrapper's default locations.
-The chosen `FM-1_731` package prefix identifies this local port; it is not a
-claim of globally registered firmware identity.
+`FM-1_731` is this port's locally chosen package prefix. It has no global registration.
 
-## Play without changing pages
+## Controls
 
 | Physical control | Beets action |
 | --- | --- |
-| White keys 1–8 / 9–16 | Deck A / B slices; tap to cue, hold two for a range |
-| OCT− / OCT+ | Focus A / B for the knobs and loop selection |
-| Black keys 1–10 | Select one of the ten demo loops for the focused deck |
+| White keys 1-8 / 9-16 | Deck A / B slices; tap to cue, hold two for a range |
+| OCT- / OCT+ | Focus A / B for the knobs and loop selection |
+| Black keys 1-10 | Select one of the ten demo loops for the focused deck |
 | Black key 11 | Unassigned |
 | PLAY | Start/stop both decks together |
 | REC | Cue both decks to their range starts on the next eighth-note |
 | SELECT | Tempo |
-| PRESETS | Blend A ↔ B |
+| PRESETS | Blend A / B |
 | ALGORITHM | Probability of switching loops |
 | KNOB 1 / 2 / 3 / 4 | Repeat / skip / reverse / stutter probability |
 | SEL / GLO | Mute A / B |
@@ -77,20 +77,19 @@ claim of globally registered firmware identity.
 | SAVE | Store the current setup while stopped |
 | MASTER | Output volume |
 
-Focus only changes which deck the knobs address. Both white-key groups always
-play their own decks. There are no settings pages and no hidden double-tap actions.
-The display always shows both decks and the focused deck's five probabilities.
+Focus selects the deck for the knobs and loop keys. Each white-key group keeps
+playing its assigned deck. The display shows both decks and the focused deck's
+probabilities on one screen.
 
 Browser shortcuts work while the panel is focused: `P` transport, `Z`/`X` focus,
-`QWERTYUI` A slices, `ASDFGHJK` B slices, `1…0` loop selection, `Esc` full range.
+`QWERTYUI` A slices, `ASDFGHJK` B slices, `1...0` loop selection, `Esc` full range.
 Drag or scroll a knob, or focus it and use arrow keys. Shift-click can hold keys
 for range chords with one pointer.
 
 ## Platform dependency
 
-`fm1-base` is a pinned Git reference, not vendored source. The wrappers initialize
-it automatically. Set `FM1_BASE=/path/to/fm1-base` to use a shared checkout instead;
-external checkouts are checked but never silently patched. See [dependency setup](docs/DEPENDENCIES.md)
+`fm1-base` is a pinned Git submodule that the wrappers initialize automatically. Set `FM1_BASE=/path/to/fm1-base` to use a shared checkout instead;
+external checkouts must already have the required patches. See [dependency setup](docs/DEPENDENCIES.md)
 for the explicit patch step, shared-checkout workflow and upgrading the pin.
 
 ## Repository layout
@@ -105,16 +104,14 @@ for the explicit patch step, shared-checkout workflow and upgrading the pin.
 Change the app without editing the platform. Upgrade the submodule deliberately,
 then rebuild and run tests before recording the new Git link.
 
-This is a port of the Norns instrument, not a Norns runtime. It does not include
-Softcut, Norns sample loading/edit pages, crow integration or arc hardware support.
+The C engine implements Beets' sequencing and sample playback. Softcut, Norns
+sample loading/edit pages, crow integration and arc hardware support are omitted.
 See the [current verification record](docs/VERIFICATION.md) for builds, installed
 firmware, hardware USB checks and remaining physical audio/control coverage gaps.
 
 ## USB MIDI visualizer feed
 
-For implementing this approach in another firmware, see the [adoption and best-practices guide](docs/TELEMETRY-BEST-PRACTICES.md).
-
-Firmware 0.2.0 emits ASCII JSON in versioned SysEx over class-compliant USB MIDI:
+Firmware 0.2.0 and later emit ASCII JSON in versioned SysEx over class-compliant USB MIDI:
 full state at sixteenth-note boundaries, input edges/deltas, and stopped heartbeats.
 Open [the TouchOSC prototype](touchosc/Beets.tosc), with [setup instructions](touchosc/README.md),
 or see [the protocol and receiver example](docs/TELEMETRY.md).
@@ -132,4 +129,6 @@ submodule for atomic nonblocking SysEx output; the submodule therefore appears
 modified after setup. The bounded JSON serializer is vendored MIT-licensed
 [jems](app/vendor/jems/PROVENANCE.md), with ASCII Unicode escaping adaptations.
 
-See the [general Norns-to-FM1 porting guide](docs/NORNS-PORTING.md), with Beets as a worked example, and [measured telemetry performance](docs/TELEMETRY-PERFORMANCE.md).
+For another instrument, see the [Norns porting guide](docs/NORNS-PORTING.md) and
+[visualizer integration guide](docs/TELEMETRY-BEST-PRACTICES.md).
+[Telemetry measurements](docs/TELEMETRY-PERFORMANCE.md) cover the cost on FM1.

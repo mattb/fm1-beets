@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-28",
+  "result": "PASS",
+  "browser": "Chrome",
+  "runtime_revision": "14cd0d9",
+  "ui_source_sha256": "11f1e453a66137c0bb5ab93887c0e5ed4f0da1dcb18c8e20f87d914ce1caf43f",
+  "wasm_sha256": "bb95c66c0a953e77af924fa7f5330f8c92c9c024be476541a9d88c51b85b5268",
+  "checks": [
+    "Revised headings and instructions visible",
+    "Power on and PLAY",
+    "A selects Amen; B unmutes and takes focus",
+    "Repeat knob sets B to 5 percent",
+    "B3-B6 latched range",
+    "Release keys, HOME and STOP"
+  ],
+  "console_warnings_errors": [],
+  "screenshot": "docs/images/beets-web.jpg",
+  "suite_log": "build/logs/prose-suite.log",
+  "scope": "Browser interaction and layout; automated suite separately checks rendered audio. No listening test."
+}
