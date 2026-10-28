@@ -104,7 +104,8 @@ compilation and simulator checks alone do not establish them.
 
 Firmware 0.2.0 emits ASCII JSON in versioned SysEx over class-compliant USB MIDI:
 full state at sixteenth-note boundaries, input edges/deltas, and stopped heartbeats.
-See [the protocol and TouchOSC receiver example](docs/TELEMETRY.md).
+Open [the TouchOSC prototype](touchosc/Beets.tosc), with [setup instructions](touchosc/README.md),
+or see [the protocol and receiver example](docs/TELEMETRY.md).
 
 ```sh
 .venv/bin/python tools/monitor-midi.py --list

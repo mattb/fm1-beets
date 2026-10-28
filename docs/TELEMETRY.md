@@ -4,7 +4,7 @@ Beets publishes its instrument and panel state as ASCII JSON inside SysEx on its
 class-compliant USB MIDI connection. This is a read-only visualizer feed: this
 protocol defines **no incoming control commands**. A receiver can draw both decks,
 playheads, probabilities, held controls, and status messages without reproducing
-the FM1's 240×240 screen. No TouchOSC layout or custom Mac/iPad app is included yet.
+the FM1's 240×240 screen. A receive-only TouchOSC prototype is included at `touchosc/Beets.tosc`; see `touchosc/README.md`.
 
 ## Wire format
 
@@ -211,8 +211,8 @@ function onReceiveMIDI(message, connections)
     if message[i] < 0x20 or message[i] > 0x7E then return true end
     chars[#chars + 1] = string.char(message[i])
   end
-  local ok, value = pcall(json.toTable, table.concat(chars))
-  if ok and type(value) == 'table' and value.v == 1 then
+  local value = json.toTable(table.concat(chars))
+  if type(value) == 'table' and value.v == 1 then
     if value.type == 'state' then state = value end
     if value.type == 'input' then lastInput = value end
   end
@@ -229,8 +229,8 @@ avoid doing drawing or expensive JSON work in the MIDI callback. Apple's
 provides the native receive path. A native app can also bridge snapshots to a
 web view for rendering; this design does **not** assume Safari Web MIDI support.
 The iPad needs a compatible USB host connection and sufficient device power.
-Actual FM1 enumeration, receiving on iPad, and the sample TouchOSC callback still
-require hardware/application verification; a finished visualizer is separate work.
+The included TouchOSC prototype has been verified on macOS with the physical FM1.
+Receiving on iPad remains unverified; see `touchosc/README.md` for setup and test scope.
 
 ## Hardware smoke test
 
