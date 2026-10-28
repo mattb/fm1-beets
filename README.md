@@ -116,6 +116,10 @@ full state at sixteenth-note boundaries, input edges/deltas, and stopped heartbe
 Open [the TouchOSC prototype](touchosc/Beets.tosc), with [setup instructions](touchosc/README.md),
 or see [the protocol and receiver example](docs/TELEMETRY.md).
 
+![Beets TouchOSC visualizer showing both decks and live USB MIDI state](docs/images/beets-touchosc.jpg)
+
+*TouchOSC on macOS receiving the FM1 state over USB MIDI, with transport stopped.*
+
 ```sh
 .venv/bin/python tools/monitor-midi.py --list
 .venv/bin/python tools/monitor-midi.py --port 'X0X FM-1'
