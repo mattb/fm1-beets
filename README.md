@@ -9,6 +9,10 @@ and the same ten demo loops. Original recordings are preserved in `assets/source
 The generated embedded bank uses mono 22.05 kHz μ-law with interpolation, a deliberate
 fidelity tradeoff to fit the FM-1's internal flash.
 
+![Beets running in Chrome: Amen on deck A, deck B focused with a slice range selected](docs/images/beets-web.jpg)
+
+*The actual WASM app running in Chrome during the browser smoke test.*
+
 ## Build and play
 
 ```sh
