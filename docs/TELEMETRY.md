@@ -1,5 +1,7 @@
 # Beets USB MIDI telemetry, version 1
 
+For architecture, integration and testing guidance, read [the adoption guide](TELEMETRY-BEST-PRACTICES.md). This document is the Beets v1 wire reference.
+
 Beets publishes its instrument and panel state as ASCII JSON inside SysEx on its
 class-compliant USB MIDI connection. This is a read-only visualizer feed: this
 protocol defines **no incoming control commands**. A receiver can draw both decks,

@@ -1,5 +1,7 @@
 # Beets TouchOSC prototype
 
+For adapting this pattern to another firmware or layout, see the [firmware and TouchOSC best-practices guide](../docs/TELEMETRY-BEST-PRACTICES.md).
+
 Open **Beets.tosc** in TouchOSC (current generation, not TouchOSC Mk1). It is a
 self-contained, receive-only 1024×768 landscape layout for Mac or iPad. All Lua
 is embedded in the document root; the adjacent `beets.lua` is the editable source.

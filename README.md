@@ -102,6 +102,8 @@ compilation and simulator checks alone do not establish them.
 
 ## USB MIDI visualizer feed
 
+For implementing this approach in another firmware, see the [adoption and best-practices guide](docs/TELEMETRY-BEST-PRACTICES.md).
+
 Firmware 0.2.0 emits ASCII JSON in versioned SysEx over class-compliant USB MIDI:
 full state at sixteenth-note boundaries, input edges/deltas, and stopped heartbeats.
 Open [the TouchOSC prototype](touchosc/Beets.tosc), with [setup instructions](touchosc/README.md),
