@@ -216,6 +216,16 @@ static void beets_input(void)
     if (input.keys_down || input.keys_up || input.buttons_down || input.buttons_up || knob >= 0)
         beets_stream_input(&input);
     if (save) beets_save();
+    /* Check the smoothed pot at 20 Hz; small jitter must not trigger snapshots. */
+    uint32_t now = plat_ms();
+    if (now - beets_ui.telemetry_master_ms >= 50u) {
+        uint32_t master = plat_master();
+        beets_ui.telemetry_master_ms = now;
+        if (master > beets_ui.telemetry_master + 16u || beets_ui.telemetry_master > master + 16u) {
+            beets_ui.telemetry_master = master;
+            beets_stream_changed();
+        }
+    }
     beets_lights();
 }
 void app_input_only(void) { beets_input(); }
@@ -343,30 +353,35 @@ int app_expect(const char *what, int *got)
 }
 #endif
 
-/* Fresh coherent engine snapshot, outside render/interrupt context. */
+#include "telemetry_profile.inc"
+
+/* Snapshot work is deferred until the stream actually needs a state message. */
+void app_telemetry_snapshot(BeetsState *snapshot, BeetsTelemetryUI *ui)
+{
+    BP_BEGIN(snap);
+    memset(ui, 0, sizeof *ui);
+    uint32_t now = plat_ms(), irq = plat_lock();
+    engine_snapshot(snapshot);
+    ui->clock_phase = engine_clock_phase();
+    engine_playback_snapshot(ui->playback);
+    plat_unlock(irq);
+    BP_END(1, snap);
+    ui->focus = beets_ui.focus; ui->dirty = beets_ui.dirty;
+    ui->keys = beets_ui.keys; ui->buttons = beets_ui.buttons;
+    ui->master = plat_master(); ui->frame_ms = beets_ui.last_draw;
+    ui->lights_buttons = beets_ui.lights_buttons; ui->lights_keys = beets_ui.lights_keys;
+    ui->dim_buttons = beets_ui.dim_buttons; ui->dim_keys = beets_ui.dim_keys;
+    if ((int32_t)(beets_ui.msg_until - now) > 0) {
+        ui->message_remaining_ms = beets_ui.msg_until - now;
+        memcpy(ui->message, beets_ui.message, sizeof ui->message);
+    }
+}
 void app_loop(void)
 {
-    BeetsState snapshot;
-    BeetsTelemetryUI ui = {0};
-    uint32_t now = plat_ms(), irq = plat_lock();
-    engine_snapshot(&snapshot);
-    ui.clock_phase = engine_clock_phase();
-    engine_playback_snapshot(ui.playback);
-    plat_unlock(irq);
-    ui.focus = beets_ui.focus; ui.dirty = beets_ui.dirty;
-    ui.keys = beets_ui.keys; ui.buttons = beets_ui.buttons;
-    ui.master = plat_master(); ui.frame_ms = beets_ui.last_draw;
-    /* Pot jitter must not turn a stopped instrument into a telemetry flood. */
-    if (now - beets_ui.telemetry_master_ms >= 50u &&
-        (ui.master > beets_ui.telemetry_master + 16u || beets_ui.telemetry_master > ui.master + 16u)) {
-        beets_ui.telemetry_master = ui.master; beets_ui.telemetry_master_ms = now;
-        beets_stream_changed();
-    }
-    ui.lights_buttons = beets_ui.lights_buttons; ui.lights_keys = beets_ui.lights_keys;
-    ui.dim_buttons = beets_ui.dim_buttons; ui.dim_keys = beets_ui.dim_keys;
-    if ((int32_t)(beets_ui.msg_until - now) > 0) {
-        ui.message_remaining_ms = beets_ui.msg_until - now;
-        memcpy(ui.message, beets_ui.message, sizeof ui.message);
-    }
-    beets_stream_poll(&snapshot, &ui, now);
+    BP_BEGIN(total);
+#if BEETS_PROFILE
+    if (beets_profile_disabled()) { BP_END(0, total); return; }
+#endif
+    beets_stream_poll(plat_ms());
+    BP_END(0, total);
 }

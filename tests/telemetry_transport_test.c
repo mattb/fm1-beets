@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "telemetry_stream.h"
-static int online = 1, blocked, count, attempts;
+static int online = 1, blocked, count, attempts, snapshots, clocks;
 static uint32_t epoch;
 static char captured[128][BEETS_TELEMETRY_CAPACITY + 1u];
 int plat_usb_connected(void) { return online; }
@@ -23,14 +23,20 @@ int plat_sysex_try_send(const uint8_t *p, uint32_t n)
 }
 static BeetsState state;
 static BeetsTelemetryUI ui;
+uint32_t plat_lock(void) { return 0; }
+void plat_unlock(uint32_t f) { (void)f; }
+void engine_clock_snapshot(BeetsClock *c)
+{ clocks++; c->playing = state.playing; c->ticks = state.ticks; c->phase = ui.clock_phase; }
+void app_telemetry_snapshot(BeetsState *s, BeetsTelemetryUI *u)
+{ snapshots++; *s = state; *u = ui; }
 static void reset(void)
 {
     memset(&state, 0, sizeof state); memset(&ui, 0, sizeof ui);
     state.tempo = 160; state.blend = 50;
-    online = 1; blocked = count = attempts = 0; epoch = 1;
+    online = 1; blocked = count = attempts = snapshots = clocks = 0; epoch = 1;
     beets_stream_init();
 }
-static void poll(uint32_t ms) { beets_stream_poll(&state, &ui, ms); }
+static void poll(uint32_t ms) { beets_stream_poll(ms); }
 static void has(int index, const char *s) { assert(index < count); assert(strstr(captured[index], s)); }
 static void event(uint32_t ms, uint32_t down, uint32_t up, int delta)
 {
@@ -47,13 +53,15 @@ int main(void)
     ui.clock_phase = 1323000; poll(1004); assert(count == 6);
     poll(1005); assert(count == 6);
 
-    reset(); blocked = 1; poll(0); poll(1); assert(!count && attempts == 2);
-    blocked = 0; poll(2); has(0, "\"seq\":0,");
-    event(3, 4, 0, -5); event(4, 0, 4, 7);
-    blocked = 1; poll(5); poll(6); assert(count == 1);
-    blocked = 0; poll(7); has(1, "\"keys_down\":4,"); has(1, "\"enc\":[-5,"); has(1, "\"seq\":1,");
-    poll(8); has(2, "\"keys_up\":4,"); has(2, "\"enc\":[7,"); has(2, "\"seq\":2,");
-    poll(9); has(3, "\"type\":\"state\""); has(3, "\"input_dropped\":0");
+    reset(); blocked = 1; poll(0);
+    for (uint32_t i = 1; i < 20; i++) poll(i);
+    assert(!count && attempts == 1 && snapshots == 1);
+    blocked = 0; poll(20); has(0, "\"seq\":0,");
+    event(21, 4, 0, -5); event(22, 0, 4, 7);
+    blocked = 1; poll(23); poll(24); assert(count == 1);
+    blocked = 0; poll(43); has(1, "\"keys_down\":4,"); has(1, "\"enc\":[-5,"); has(1, "\"seq\":1,");
+    poll(44); has(2, "\"keys_up\":4,"); has(2, "\"enc\":[7,"); has(2, "\"seq\":2,");
+    poll(45); has(3, "\"type\":\"state\""); has(3, "\"input_dropped\":0");
 
     reset(); poll(0); for (int i = 0; i < 35; i++) event((uint32_t)i, (uint32_t)i + 1, 0, i);
     poll(100); has(1, "\"input_dropped\":3"); has(1, "\"type\":\"state\"");
@@ -78,6 +86,17 @@ int main(void)
 
     reset(); poll(0xfffffff0u); poll(0x000003d7u); assert(count == 1);
     poll(0x000003d8u); assert(count == 2); /* unsigned millisecond wrap */
+    reset(); poll(0);
+    for (int i = 0; i < 10000; i++) poll(0);
+    assert(snapshots == 1 && clocks == 1 && attempts == 1);
+    for (uint32_t i = 1; i < 1000; i++) poll(i);
+    assert(snapshots == 1 && attempts == 1); /* only cheap clock reads while idle */
+    online = 0; poll(1000); int previous_clocks = clocks;
+    for (uint32_t i = 1001; i < 1100; i++) poll(i);
+    assert(snapshots == 1 && clocks == previous_clocks); /* no engine reads disconnected */
+    reset(); blocked = 1;
+    for (uint32_t i = 0; i < 1000; i++) poll(i);
+    assert(attempts == 50 && snapshots == 50); /* bounded retries without a frame cache */
     puts("Telemetry transport passed: atomic retry, edge FIFO, overflow, state deadline, reconnect, heartbeat and timer wrap.");
     return 0;
 }

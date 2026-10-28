@@ -326,3 +326,7 @@ For adoption, start with one heartbeat containing one real engine parameter,
 prove it in TouchOSC, then add the full schema and musical cadence. Preserve the
 same separation as the system grows: the engine owns truth, the stream is bounded
 and lossy by design, and the display makes freshness and loss visible.
+
+## Measure observation overhead
+
+Check connection and scheduling deadlines before capturing full state. A tiny clock snapshot can decide whether a musical update is due. Bound retries after backpressure; repeated serialization in a busy loop wastes more work than the normal stream. Start with a short retry interval before introducing cached frames or readiness APIs. See the [measured Beets optimization](TELEMETRY-PERFORMANCE.md), including disabled-mode comparison and timing limitations.

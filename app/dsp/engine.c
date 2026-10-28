@@ -320,3 +320,8 @@ void engine_playback_snapshot(BeetsPlaybackState out[BEETS_LANES])
         out[lane].gain_ppm = engine_ppm(v->gain, 1.0f);
     }
 }
+
+void engine_clock_snapshot(BeetsClock *out)
+{
+    out->playing = state.playing; out->ticks = state.ticks; out->phase = engine_clock_phase();
+}

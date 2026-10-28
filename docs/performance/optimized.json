@@ -1,0 +1,236 @@
+[
+  {
+    "transport": "stopped",
+    "mode": "normal",
+    "seconds": 8.002452916666666,
+    "scopes": {
+      "app_loop": {
+        "calls": 13372,
+        "calls_per_second": 1670.9876508176894,
+        "elapsed_share_pct": 0.15304161687507586,
+        "mean_us": 0.915875211885532,
+        "max_us": 704.25
+      },
+      "snapshot": {
+        "calls": 8,
+        "calls_per_second": 0.9996934794003527,
+        "elapsed_share_pct": 0.0010371819848778658,
+        "mean_us": 10.375,
+        "max_us": 10.375
+      },
+      "serialize": {
+        "calls": 8,
+        "calls_per_second": 0.9996934794003527,
+        "elapsed_share_pct": 0.043788657092484196,
+        "mean_us": 438.0208333333333,
+        "max_us": 598.75
+      },
+      "send": {
+        "calls": 8,
+        "calls_per_second": 0.9996934794003527,
+        "elapsed_share_pct": 0.009316414284849224,
+        "mean_us": 93.19270833333333,
+        "max_us": 94.45833333333333
+      }
+    },
+    "rejected": 0,
+    "max_irq_lock_us": 194,
+    "audio_xruns": 0,
+    "audio_render_pct": 0
+  },
+  {
+    "transport": "stopped",
+    "mode": "disabled",
+    "seconds": 8.017921666666666,
+    "scopes": {
+      "app_loop": {
+        "calls": 13456,
+        "calls_per_second": 1678.2403918887544,
+        "elapsed_share_pct": 0.02247413242791721,
+        "mean_us": 0.1339148583036068,
+        "max_us": 6.5
+      },
+      "snapshot": {
+        "calls": 0,
+        "calls_per_second": 0.0,
+        "elapsed_share_pct": 0.0,
+        "mean_us": 0,
+        "max_us": 0.0
+      },
+      "serialize": {
+        "calls": 0,
+        "calls_per_second": 0.0,
+        "elapsed_share_pct": 0.0,
+        "mean_us": 0,
+        "max_us": 0.0
+      },
+      "send": {
+        "calls": 0,
+        "calls_per_second": 0.0,
+        "elapsed_share_pct": 0.0,
+        "mean_us": 0,
+        "max_us": 0.0
+      }
+    },
+    "rejected": 0,
+    "max_irq_lock_us": 196,
+    "audio_xruns": 0,
+    "audio_render_pct": 0
+  },
+  {
+    "transport": "stopped",
+    "mode": "blocked",
+    "seconds": 7.979880416666667,
+    "scopes": {
+      "app_loop": {
+        "calls": 13127,
+        "calls_per_second": 1645.0121198035913,
+        "elapsed_share_pct": 1.2099565192941226,
+        "mean_us": 7.355304588507148,
+        "max_us": 617.7083333333334
+      },
+      "snapshot": {
+        "calls": 210,
+        "calls_per_second": 26.316183831702155,
+        "elapsed_share_pct": 0.028937881431285024,
+        "mean_us": 10.99623015873016,
+        "max_us": 18.833333333333332
+      },
+      "serialize": {
+        "calls": 210,
+        "calls_per_second": 26.316183831702155,
+        "elapsed_share_pct": 1.1228671816458402,
+        "mean_us": 426.68313492063487,
+        "max_us": 598.7916666666666
+      },
+      "send": {
+        "calls": 210,
+        "calls_per_second": 26.316183831702155,
+        "elapsed_share_pct": 0.000346705279052584,
+        "mean_us": 0.13174603174603175,
+        "max_us": 6.458333333333333
+      }
+    },
+    "rejected": 210,
+    "max_irq_lock_us": 194,
+    "audio_xruns": 0,
+    "audio_render_pct": 0
+  },
+  {
+    "transport": "playing",
+    "mode": "normal",
+    "seconds": 8.013594666666666,
+    "scopes": {
+      "app_loop": {
+        "calls": 12776,
+        "calls_per_second": 1594.2907685539708,
+        "elapsed_share_pct": 0.6930847180358177,
+        "mean_us": 4.347291797119599,
+        "max_us": 884.1666666666666
+      },
+      "snapshot": {
+        "calls": 86,
+        "calls_per_second": 10.731763157141632,
+        "elapsed_share_pct": 0.011417056947893214,
+        "mean_us": 10.638565891472867,
+        "max_us": 18.708333333333332
+      },
+      "serialize": {
+        "calls": 86,
+        "calls_per_second": 10.731763157141632,
+        "elapsed_share_pct": 0.47399244550427305,
+        "mean_us": 441.67248062015506,
+        "max_us": 774.4583333333334
+      },
+      "send": {
+        "calls": 86,
+        "calls_per_second": 10.731763157141632,
+        "elapsed_share_pct": 0.1024503818178309,
+        "mean_us": 95.46463178294574,
+        "max_us": 108.0
+      }
+    },
+    "rejected": 0,
+    "max_irq_lock_us": 367,
+    "audio_xruns": 0,
+    "audio_render_pct": 0
+  },
+  {
+    "transport": "playing",
+    "mode": "disabled",
+    "seconds": 7.9868923333333335,
+    "scopes": {
+      "app_loop": {
+        "calls": 13068,
+        "calls_per_second": 1636.1808140896853,
+        "elapsed_share_pct": 0.022284950462793687,
+        "mean_us": 0.13620102540557086,
+        "max_us": 12.125
+      },
+      "snapshot": {
+        "calls": 0,
+        "calls_per_second": 0.0,
+        "elapsed_share_pct": 0.0,
+        "mean_us": 0,
+        "max_us": 0.0
+      },
+      "serialize": {
+        "calls": 0,
+        "calls_per_second": 0.0,
+        "elapsed_share_pct": 0.0,
+        "mean_us": 0,
+        "max_us": 0.0
+      },
+      "send": {
+        "calls": 0,
+        "calls_per_second": 0.0,
+        "elapsed_share_pct": 0.0,
+        "mean_us": 0,
+        "max_us": 0.0
+      }
+    },
+    "rejected": 0,
+    "max_irq_lock_us": 366,
+    "audio_xruns": 0,
+    "audio_render_pct": 0
+  },
+  {
+    "transport": "playing",
+    "mode": "blocked",
+    "seconds": 8.022014666666667,
+    "scopes": {
+      "app_loop": {
+        "calls": 12663,
+        "calls_per_second": 1578.5311453764482,
+        "elapsed_share_pct": 1.3411796097439197,
+        "mean_us": 8.496377240780227,
+        "max_us": 791.25
+      },
+      "snapshot": {
+        "calls": 211,
+        "calls_per_second": 26.30261957470035,
+        "elapsed_share_pct": 0.029278285205495344,
+        "mean_us": 11.131319115323855,
+        "max_us": 20.125
+      },
+      "serialize": {
+        "calls": 211,
+        "calls_per_second": 26.30261957470035,
+        "elapsed_share_pct": 1.2434075164160756,
+        "mean_us": 472.73143759873614,
+        "max_us": 778.875
+      },
+      "send": {
+        "calls": 211,
+        "calls_per_second": 26.30261957470035,
+        "elapsed_share_pct": 0.0002643766461991011,
+        "mean_us": 0.10051342812006318,
+        "max_us": 0.125
+      }
+    },
+    "rejected": 211,
+    "max_irq_lock_us": 369,
+    "audio_xruns": 0,
+    "audio_render_pct": 0
+  }
+]

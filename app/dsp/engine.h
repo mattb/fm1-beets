@@ -42,6 +42,9 @@ const char *engine_loop_name(int loop);
 
 /* Capture under the same lock as engine_snapshot; not persisted. */
 uint32_t engine_clock_phase(void);
+typedef struct { int playing; uint32_t ticks, phase; } BeetsClock;
+/* Cheap scheduling fields only; caller holds the same snapshot lock. */
+void engine_clock_snapshot(BeetsClock *out);
 
 /* Transient render position, deliberately separate from persisted BeetsState.
  * PPM fields normalize source-sample coordinates to 0..1000000. active is

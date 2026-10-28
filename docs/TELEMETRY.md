@@ -42,7 +42,7 @@ at each observed sixteenth-note boundary while playing, and at least once a
 second while stopped when USB can accept it. `input` messages carry observed
 press/release edges and encoder deltas. Inputs use a 32-entry FIFO; a state
 snapshot takes priority after 100 ms so sustained input cannot starve it.
-Serialization and USB output run outside the audio interrupt.
+Serialization and USB output run outside the audio interrupt. Due checks run at most once per device millisecond; full state is captured only when needed. A failed send delays the next attempt by 20 ms. See [hardware performance measurements](TELEMETRY-PERFORMANCE.md).
 
 This is best-effort telemetry, not a sample-accurate event log. Backpressure holds
 queued inputs and coalesces snapshots. FIFO overflow and stale queued inputs

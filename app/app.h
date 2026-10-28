@@ -24,3 +24,9 @@ int app_expect(const char *what, int *got);
 
 #define APP_LOOP
 void app_loop(void);
+
+#include "telemetry_profile.h"
+#if BEETS_PROFILE && !defined(PLAT_HOST)
+#define APP_SYSEX
+int app_sysex(const uint8_t *p, uint32_t n);
+#endif
