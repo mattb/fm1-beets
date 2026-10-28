@@ -1,5 +1,8 @@
 # Beets FM-1: independent playability and fidelity review
 
+Historical review from the initial port, before device installation. For later
+hardware evidence and current gaps, see [the verification record](VERIFICATION.md).
+
 This is a C port of the musical core of Matt Biddulph's Norns Beets, with an FM-1 performance interface. It is not an emulation of Norns or softcut. The source reference is `mattb/beets` commit `226c2b892658bf7418555677a6a5aeab6fb3cfc6`, principally `lib/libbeets.lua` and `beets.lua`. The upstream `docs-src` text is generic Docz starter content; it was not used as instrument documentation.
 
 ## Musical behavior retained

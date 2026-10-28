@@ -96,5 +96,6 @@ filter/resonance/pan pages, arc or crow integration. USB audio output from the
 instrument is compiled in; Bluetooth and Wi-Fi are omitted to keep memory free.
 MIDI notes 36–43 trigger slices (channel 1 A, channel 2 B); MIDI start/stop are
 handled. MIDI clock sync and external Web MIDI routing are not implemented.
-Physical audio quality, control feel, CPU headroom and firmware installation still
-need testing on an FM-1.
+Firmware installation, USB MIDI and bounded processing measurements have been
+verified. Physical audio quality and control feel still need hands-on validation;
+see the [current verification record](../../docs/VERIFICATION.md) for scope and evidence.

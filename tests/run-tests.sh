@@ -19,6 +19,11 @@ cc -std=c99 -Wall -Wextra -Werror -O1 -g \
 app/build/tests/engine-test | tee app/build/tests/engine.log
 cc -std=c99 -Wall -Wextra -Werror -O1 -g \
   -fsanitize=address,undefined -fno-omit-frame-pointer \
+  -Iapp/dsp -Iapp/build/gen tests/contract_test.c app/dsp/engine.c \
+  -o app/build/tests/contract-test
+app/build/tests/contract-test | tee app/build/tests/contract.log
+cc -std=c99 -Wall -Wextra -Werror -O1 -g \
+  -fsanitize=address,undefined -fno-omit-frame-pointer \
   -Iapp -I"$BASE/include" tests/telemetry_transport_test.c \
   app/telemetry_stream.c app/telemetry.c app/vendor/jems/jems.c \
   -o app/build/tests/telemetry-transport-test

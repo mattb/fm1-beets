@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-28",
+  "runtime_revision": "14cd0d9",
+  "browser": "Chrome",
+  "url": "http://127.0.0.1:8081/",
+  "wasm_sha256": "bb95c66c0a953e77af924fa7f5330f8c92c9c024be476541a9d88c51b85b5268",
+  "result": "PASS",
+  "checks": [
+    "Power on",
+    "PLAY and advancing deck displays",
+    "Select Loop 9: A AMEN 1",
+    "Unmute B and focus B",
+    "Repeat knob changes B to 5 percent",
+    "Shift-click B3/B6 sets range",
+    "Release keys and HOME restores full range",
+    "STOP clears playing indicator"
+  ],
+  "console_warnings_errors": [],
+  "scope": "UI and live WASM integration; no claim of audible output quality. Automated WASM suite separately verifies nonzero bounded audio and stop silence."
+}

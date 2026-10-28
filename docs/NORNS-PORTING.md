@@ -156,6 +156,10 @@ Record revision, target, device identity, date, capture/log locations, and cover
 
 > **Beets example:** [PORT_REVIEW.md](PORT_REVIEW.md) records the original source-fidelity and test work; its hardware caveats predate later flashing and USB telemetry tests. The project subsequently verified physical installation and macOS TouchOSC reception. The later [telemetry performance report](TELEMETRY-PERFORMANCE.md) records measured device overhead and validation for production 0.2.3. Those results do not establish every audio/peripheral path or iPad compatibility. Its repository-specific entry points are `tools/build-local.sh --all` and `tests/run-tests.sh --no-build`.
 
+For this repository, the [boundary fixtures](../tests/fixtures/README.md) and
+[current verification record](VERIFICATION.md) now provide examples of proposals
+1 and 3 below; demand-driven observation is implemented and measured.
+
 ## Proposed small improvements for future ports
 
 These are review proposals, not implementation changes made by this guide:

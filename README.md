@@ -103,8 +103,8 @@ then rebuild and run tests before recording the new Git link.
 
 This is a port of the Norns instrument, not a Norns runtime. It does not include
 Softcut, Norns sample loading/edit pages, crow integration or arc hardware support.
-Physical device boot, controls, audio load and USB behavior require an FM-1 test;
-compilation and simulator checks alone do not establish them.
+See the [current verification record](docs/VERIFICATION.md) for builds, installed
+firmware, hardware USB checks and remaining physical audio/control coverage gaps.
 
 ## USB MIDI visualizer feed
 
