@@ -6,7 +6,7 @@
 #define BEETS_TELEMETRY_VERSION 1u
 /* UTF-8 message may occupy all 48 bytes; serializer never reads past it. */
 typedef struct {
-    int focus, dirty, clock_source;
+    int focus, dirty, clock_source, output_split;
     uint32_t keys, buttons, frame_ms, clock_phase, message_remaining_ms;
     uint32_t master, lights_buttons, lights_keys, dim_buttons, dim_keys;
     uint32_t input_dropped;

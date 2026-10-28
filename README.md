@@ -74,6 +74,7 @@ git clone --depth 1 --branch AC79NN_SDK_V1.2.1_2023-12-13 \
 | HOME | Return the focused deck to its full slice range |
 | SEQ | Automatically advance loops |
 | EDIT (hold) + white / black | Toggle eligible slices / loops |
+| EDIT (hold) + PRESETS | While stopped: clockwise selects A left / B right; counterclockwise selects mono. Press SAVE to retain it. |
 | SAVE | Store the current setup while stopped |
 | MASTER | Output volume |
 
@@ -85,6 +86,21 @@ Browser shortcuts work while the panel is focused: `P` transport, `Z`/`X` focus,
 `QWERTYUI` A slices, `ASDFGHJK` B slices, `1...0` loop selection, `Esc` full range.
 Drag or scroll a knob, or focus it and use arrow keys. Shift-click can hold keys
 for range chords with one pointer.
+
+## Audio outputs
+
+Default output is dual mono: the same two-deck mix on left and right. For separate
+deck outputs, stop playback, hold **EDIT**, turn **PRESETS** clockwise, then release
+EDIT and press **SAVE**. A goes hard left and B hard right. Turn PRESETS
+counterclockwise with EDIT held to return to mono, then SAVE again. The setting
+survives restart; older saved setups load in mono. MASTER, deck mutes and the
+PRESETS blend still affect levels in split mode. At the center blend, each deck
+keeps its existing half-level contribution.
+
+The routing applies to stereo analog output and class-compliant USB audio from
+FM1 to the computer. In a DAW, select the FM1 audio input's two channels. The build
+flag `usb_audio_in = true` names the USB direction from the computer's perspective;
+`usb_audio_out = false` only disables computer-to-FM1 playback.
 
 ## Platform dependency
 

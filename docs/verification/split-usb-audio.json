@@ -1,0 +1,66 @@
+{
+  "date": "2026-10-28",
+  "firmware": "FM-1_731000301",
+  "result": "PASS with stated host mono tolerance",
+  "device": "BEETS FM-1, Core Audio, 2 input channels",
+  "captures": [
+    {
+      "mode": "split-a",
+      "sample_rate": 44100,
+      "peak_pcm16": [
+        10308,
+        0
+      ],
+      "max_channel_difference_pcm16": 10308,
+      "wav_sha256": "96abac27ab5743ffd92c1fe4a339fdc5b35db83cd3b0ede1961202ab8765b305"
+    },
+    {
+      "mode": "split-b",
+      "sample_rate": 44100,
+      "peak_pcm16": [
+        0,
+        10308
+      ],
+      "max_channel_difference_pcm16": 10308,
+      "wav_sha256": "08d9fd87f9c46c1bf846b449c1ce51e816de67865a40cd108a5d884ffd3971f3"
+    },
+    {
+      "mode": "split-a",
+      "sample_rate": 48000,
+      "peak_pcm16": [
+        10341,
+        0
+      ],
+      "max_channel_difference_pcm16": 10341,
+      "wav_sha256": "07235e9209a8cf2ea7c6ee1281a98a8a4b2d42a3b3e2dc6aea424aeb1698040f"
+    },
+    {
+      "mode": "split-b",
+      "sample_rate": 48000,
+      "peak_pcm16": [
+        0,
+        10328
+      ],
+      "max_channel_difference_pcm16": 10328,
+      "wav_sha256": "4f8d123e7d9f74446dcc869028ccc8604d7deeffea380ae6358bed4215bde579"
+    },
+    {
+      "mode": "mono",
+      "sample_rate": 44100,
+      "peak_pcm16": [
+        20616,
+        20615
+      ],
+      "max_channel_difference_pcm16": 2,
+      "wav_sha256": "e02c0f590f0a9a0c6a2365d2f463db9f57b50c4d635d07cc611cb45434da2f36"
+    }
+  ],
+  "mono_tolerance_pcm16": 2,
+  "note": "Initial exact-equality mono assertion failed; captured WAVs were rechecked with the stated two-count tolerance. No new recording was made. Native/WASM render requires exact equality. Initial captures used a full MASTER override; it was released and removed from the harness after the user reported speaker volume. Device left stopped in mono.",
+  "persistence": "Native reboot checks split and mono; WASM reload checks channel isolation and legacy-save recovery. Physical power cycle not tested.",
+  "limits": [
+    "No analog output capture",
+    "No iPad USB audio test",
+    "No long-duration dropout test"
+  ]
+}

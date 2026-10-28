@@ -217,3 +217,33 @@ expect focus 1
 listen
 wait 100
 said BEETS
+# Hidden output routing uses physical EDIT + PRESETS, without changing blend.
+press EDIT
+turn PRESET 1
+wait 30
+release EDIT
+expect output_split 1
+expect blend 40
+tap SAVE
+wait 30
+reboot
+wait 600
+expect output_split 1
+expect blend 40
+tap PLAY
+press EDIT
+turn PRESET -1
+wait 30
+release EDIT
+expect output_split 1
+tap PLAY
+press EDIT
+turn PRESET -1
+wait 30
+release EDIT
+expect output_split 0
+tap SAVE
+wait 30
+reboot
+wait 600
+expect output_split 0

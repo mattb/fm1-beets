@@ -16,7 +16,7 @@ static struct {
     char message[48];
     BeetsState state;
 } beets_ui;
-typedef struct { uint32_t magic; int focus; BeetsState state; } BeetsSave;
+typedef struct { uint32_t magic; int focus; BeetsState state; int output_split; } BeetsSave;
 static void beets_cat(char *d, const char *s) { while (*d) d++; while (*s) *d++ = *s++; *d = 0; }
 static void beets_number(int value, char *out)
 {
@@ -41,6 +41,7 @@ static void beets_restore(const BeetsSave *s)
 {
     int d, p;
     engine_tempo(s->state.tempo); engine_blend(s->state.blend);
+    engine_output_split(s->output_split == 1);
     beets_ui.focus = s->focus == 1;
     for (d = 0; d < 2; d++) {
         const BeetsLaneState *l = &s->state.lane[d];
@@ -52,12 +53,15 @@ static void beets_restore(const BeetsSave *s)
 }
 void app_init(void)
 {
-    BeetsSave saved;
+    BeetsSave saved = {0};
+    int saved_size;
     memset(&beets_ui, 0, sizeof beets_ui);
     beets_ui.reverse_deck = beets_ui.stutter_deck = -1;
     engine_init(0xBE375u);
     beets_stream_init();
-    if (plat_store_load(OBJ_SETTINGS, &saved, sizeof saved) == (int)sizeof saved && saved.magic == BEETS_SAVE_MAGIC)
+    saved_size = plat_store_load(OBJ_SETTINGS, &saved, sizeof saved);
+    /* Older saves end immediately before output_split; keep their setup in mono. */
+    if ((saved_size == (int)sizeof saved || saved_size == (int)(sizeof saved - sizeof saved.output_split)) && saved.magic == BEETS_SAVE_MAGIC)
         beets_restore(&saved);
     beets_clock_init();
     beets_snapshot();
@@ -83,6 +87,7 @@ static void beets_save(void)
     if (beets_ui.state.playing) { app_say("STOP TO SAVE", ""); return; }
     app_panic(); /* stopped previews must also be silent before flash writes */
     saved.magic = BEETS_SAVE_MAGIC; saved.focus = beets_ui.focus; saved.state = beets_ui.state;
+    saved.output_split = engine_output_is_split();
     for (d = 0; d < 2; d++) {
         if (saved.state.lane[d].queued_loop >= 0) saved.state.lane[d].loop = saved.state.lane[d].queued_loop;
     }
@@ -184,6 +189,9 @@ static void beets_input(void)
         knob = i;
         input.enc[i] = e;
         if (i == EN_SELECT) { if (!beets_clock_external()) engine_tempo(beets_ui.state.tempo + e); }
+        else if (i == EN_PRESET && edit) {
+            if (!beets_ui.state.playing) { engine_panic(); engine_output_split(e > 0); }
+        }
         else if (i == EN_PRESET) engine_blend(beets_ui.state.blend + e);
         else if (p >= 0 && p < 5) engine_probability(d, p, beets_ui.state.lane[d].probability[p] + e * 5);
         beets_ui.dirty = 1;
@@ -201,7 +209,11 @@ static void beets_input(void)
     if (down & (1u << B_REC)) app_say("RE-CUE", "BOTH DECKS");
     if (down & (1u << B_EDIT)) app_say("HOLD EDIT", "KEYS TOGGLE ELIGIBILITY");
     if (msg[0]) app_say(msg, "");
-    if (knob == EN_SELECT && beets_clock_external()) app_say("EXTERNAL CLOCK", "TEMPO FROM MIDI");
+    if (knob == EN_PRESET && edit) {
+        if (beets_ui.state.playing) app_say("STOP TO CHANGE", "OUTPUT ROUTING");
+        else app_say("OUTPUT", engine_output_is_split() ? "A LEFT / B RIGHT" : "MONO");
+    }
+    else if (knob == EN_SELECT && beets_clock_external()) app_say("EXTERNAL CLOCK", "TEMPO FROM MIDI");
     else if (knob >= 0) {
         static const char *const names[5] = {"REPEAT", "SKIP", "REVERSE", "STUTTER", "LOOP SWITCH"};
         char n[12]; int value;
@@ -335,6 +347,7 @@ int app_expect(const char *what, int *got)
     if (!strcmp(what, "playing")) *got = s.playing;
     else if (!strcmp(what, "tempo")) *got = s.tempo;
     else if (!strcmp(what, "blend")) *got = s.blend;
+    else if (!strcmp(what, "output_split")) *got = engine_output_is_split();
     else if (!strcmp(what, "focus")) *got = beets_ui.focus;
     else if (!strcmp(what, "dirty")) *got = beets_ui.dirty;
     else if ((what[0] == 'a' || what[0] == 'b') && what[1] == '_') {
@@ -369,6 +382,7 @@ void app_telemetry_snapshot(BeetsState *snapshot, BeetsTelemetryUI *ui)
     engine_snapshot(snapshot);
     ui->clock_phase = engine_clock_phase();
     ui->clock_source = beets_clock_external();
+    ui->output_split = engine_output_is_split();
     engine_playback_snapshot(ui->playback);
     plat_unlock(irq);
     BP_END(1, snap);

@@ -19,7 +19,9 @@ static BeetsState state;
 static Voice voice[BEETS_LANES];
 static uint32_t clock_phase;
 static void tick(void);
-static int external_clock;
+static int external_clock, output_split;
+void engine_output_split(int enabled) { output_split = !!enabled; }
+int engine_output_is_split(void) { return output_split; }
 static unsigned midi_pulse;
 static void (*clock_send)(uint8_t);
 void engine_clock_output(void (*send)(uint8_t)) { clock_send = send; }
@@ -150,7 +152,7 @@ void engine_init(uint32_t seed)
     state = (BeetsState){0};
     for (lane = 0; lane < BEETS_LANES; lane++) voice[lane] = (Voice){0};
     state.tempo = 160; state.blend = 50; state.rng = seed ? seed : 0xBE375123u;
-    clock_phase = 0; midi_pulse = 0; external_clock = 0; clock_send = 0;
+    clock_phase = 0; midi_pulse = 0; external_clock = 0; clock_send = 0; output_split = 0;
     for (lane = 0; lane < BEETS_LANES; lane++) {
         BeetsLaneState *s = &state.lane[lane];
         s->loop = lane; s->slice = 0; s->queued_loop = s->queued_slice = -1;
@@ -259,7 +261,7 @@ void engine_render(int32_t *lr, uint32_t frames, uint32_t master_q12)
     float master = (float)(master_q12 > 4096u ? 4096u : master_q12) / 4096.0f;
     float weights[2] = {(float)(100 - state.blend) * 0.01f, (float)state.blend * 0.01f};
     for (f = 0; f < frames; f++) {
-        float mixed = 0.0f;
+        float mixed[2] = {0.0f, 0.0f};
         int lane;
         for (lane = 0; lane < BEETS_LANES; lane++) {
             BeetsLaneState *s = &state.lane[lane];
@@ -297,13 +299,16 @@ void engine_render(int32_t *lr, uint32_t frames, uint32_t master_q12)
                 v->last_output = out;
                 v->position += (float)v->direction * v->increment;
             }
-            mixed += out * v->gain * weights[lane];
+            mixed[output_split ? lane : 0] += out * v->gain * weights[lane];
             if (v->audition) v->audition--;
         }
-        mixed *= master * 0.9f; /* fixed headroom; equal-sum crossfade cannot overload */
-        if (mixed > 1.0f) mixed = 1.0f;
-        if (mixed < -1.0f) mixed = -1.0f;
-        lr[2u*f] = lr[2u*f+1u] = (int32_t)(mixed * FULL_SCALE);
+        if (!output_split) mixed[1] = mixed[0];
+        for (lane = 0; lane < 2; lane++) {
+            float out = mixed[lane] * master * 0.9f;
+            if (out > 1.0f) out = 1.0f;
+            if (out < -1.0f) out = -1.0f;
+            lr[2u*f + lane] = (int32_t)(out * FULL_SCALE);
+        }
         state.frames++;
         if (state.playing) {
             clock_phase += (uint32_t)state.tempo * 2u;

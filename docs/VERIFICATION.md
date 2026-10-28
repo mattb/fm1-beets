@@ -1,8 +1,32 @@
 # Current verification record
 
-Updated 2026-10-28. Installed production firmware is **0.3.0**, device identity
-`FM-1_731000300`. This revision adds MIDI clock and updates the platform pin.
+Updated 2026-10-28. Installed production firmware is **0.3.1**, device identity
+`FM-1_731000301`. This revision adds persistent split output.
 The platform and carried patches are described in [DEPENDENCIES.md](DEPENDENCIES.md).
+
+## Split-output update
+
+- All three targets built; full automated suite passed (`build/logs/split-build.log`,
+  `build/logs/split-suite.log`). Firmware image: 424,880 bytes.
+- Native tests verify EDIT + PRESETS, unchanged blend, routing changes blocked
+  during playback, SAVE and reboot into split and mono.
+- WASM tests verify A-left/B-right isolation after SAVE/reload, exact dual-mono
+  equality after returning to mono, and unchanged audio from legacy saved setups.
+- Chrome smoke checked the gesture, temporary messages, SAVE, reload, playback,
+  blocked routing changes while playing, and return to mono. No captured console errors.
+- Physical USB audio captures passed channel isolation at 44.1 and 48 kHz.
+  The mono capture had a maximum two-count PCM16 channel difference; the initial
+  exact-equality capture assertion failed and the saved WAV was rechecked with that
+  explicit tolerance. [Capture results and limits](verification/split-usb-audio.json).
+- Firmware was flashed and its identity queried. Physical power-cycle persistence,
+  analog channel capture and iPad USB audio remain untested. The device was left
+  stopped in mono with the physical MASTER knob in control.
+
+To repeat the audio capture, install `sounddevice` alongside the MIDI harness
+requirements and run `.venv/bin/python tools/smoke-usb-audio.py`. This operates
+transport and mutes, restores routing/blend/mutes/transport, and does not SAVE.
+The physical MASTER knob remains in control: choose a comfortable audible level.
+Captured WAVs are local in `build/tests/usb-audio/`.
 
 ## MIDI clock update
 
@@ -51,8 +75,8 @@ linked performance JSON and fixture expectations are committed. Run the checks a
 - Physical DAC listening and transition quality, prolonged worst-case playback,
   and hands-on key/chord/MASTER feel. Remote panel injection does not test the
   physical sensors or electrical controls.
-- Physical TRS MIDI and USB audio routing/quality; successful USB MIDI does not
-  establish either. Device SAVE plus power-cycle recovery has not been verified
+- Physical TRS MIDI and prolonged USB audio quality; the short captures above
+  establish channel routing only. Device SAVE plus power-cycle recovery has not been verified
   here; persistence is covered in native and WASM tests.
 - iPad TouchOSC and other controller/OS combinations.
 - Softcut render equivalence: the sample encoding, rate conversion and fades are

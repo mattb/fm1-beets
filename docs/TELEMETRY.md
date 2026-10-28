@@ -71,6 +71,7 @@ Both message types contain `v:1`, `type`, `seq`, and `ms`.
 | `frames` | Total rendered stereo sample frames, including stopped time; uint32 wraps. |
 | `ticks` | Cumulative eighth-note triggers; uint32 wraps. Start triggers an eighth immediately. |
 | `rng` | Engine's current random-generator state; diagnostic, not a UI control. |
+| `output_split` | 0 dual mono, 1 deck A left / deck B right. Added in firmware 0.3.1. |
 | `clock_source` | 0 internal, 1 USB MIDI, 2 TRS MIDI. Added in firmware 0.3.0. |
 | `clock_phase` | Integer numerator of position within the current eighth; denominator **2646000**. |
 | `lanes` | Two objects, ordered A then B, described below. |

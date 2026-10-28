@@ -29,6 +29,8 @@ void engine_play(int on);
 void engine_panic(void); /* immediate silence, including stopped auditions */
 void engine_tempo(int bpm);
 void engine_blend(int percent);
+void engine_output_split(int enabled);
+int engine_output_is_split(void);
 void engine_loop(int lane, int loop);
 void engine_range(int lane, int first, int last);
 void engine_trigger(int lane, int slice);

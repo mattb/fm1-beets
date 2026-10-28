@@ -65,6 +65,34 @@ assert(Object.keys(saved).length>0,'SAVE must produce a persistent settings obje
 const reference=await boot();reference.web_enc(0,17);reference.web_keys(1<<black[7]);render(reference,2205);reference.web_keys(0);render(reference,41895);press(reference,10);const beforeRestore=render(reference,44100);
 const restored=await boot(saved);render(restored,44100);press(restored,10);const afterRestore=render(restored,44100);
 assert(Buffer.from(beforeRestore.buffer).equals(Buffer.from(afterRestore.buffer)),'saved tempo and sample must restore to identical audio at the same control/audio timeline');
+// Split mode isolates each deck and persists without changing the old save prefix.
+function split(ex,on) {
+  ex.web_buttons(1<<4); render(ex,2205); // physical EDIT
+  ex.web_enc(2,on?1:-1); render(ex,2205); // physical PRESETS
+  ex.web_buttons(0); render(ex,2205);
+}
+function channels(pcm) {
+  const peaks=[0,0]; for(let i=0;i<pcm.length;i++) peaks[i%2]=Math.max(peaks[i%2],Math.abs(pcm[i]));
+  return peaks;
+}
+function store(ex) {
+  const result={}; for(let obj=0;obj<ex.web_nobj();obj++) { const n=ex.web_store_len(obj); if(n>0) result[obj]=new Uint8Array(ex.memory.buffer,ex.web_store(obj),n).slice(); }
+  return result;
+}
+const splitEx=await boot(); render(splitEx,44100); split(splitEx,true); press(splitEx,7);
+const splitSaved=store(splitEx), splitRestored=await boot(splitSaved); render(splitRestored,44100); press(splitRestored,10);
+const onlyA=channels(render(splitRestored,44100)); assert(onlyA[0]>.01 && onlyA[1]===0,'saved split: A only on left');
+press(splitRestored,1); press(splitRestored,5); render(splitRestored,44100);
+const onlyB=channels(render(splitRestored,44100)); assert(onlyB[0]===0 && onlyB[1]>.01,'split: B only on right');
+press(splitRestored,10); split(splitRestored,false); press(splitRestored,7);
+const monoRestored=await boot(store(splitRestored)); render(monoRestored,44100); press(monoRestored,10);
+const mono=render(monoRestored,44100); assert(channels(mono)[0]>.01);
+for(let i=0;i<mono.length;i+=2) assert.equal(mono[i],mono[i+1],'saved mono: identical channels');
+// Remove the appended field to reproduce a pre-routing settings object.
+const legacy=Object.fromEntries(Object.entries(saved).map(([k,v])=>[k,v.slice(0,-4)]));
+const legacyEx=await boot(legacy);render(legacyEx,44100);press(legacyEx,10);
+assert(Buffer.from(render(legacyEx,44100).buffer).equals(Buffer.from(beforeRestore.buffer)),'legacy setup must restore unchanged in mono');
+console.log('PASS split L/R isolation, split and mono persistence, legacy save migration');
 const a=perform(await boot(),128),b=perform(await boot(),256);
 assert(Buffer.from(a.pcm.buffer).equals(Buffer.from(b.pcm.buffer)),'fresh render must be reproducible across audio quantum sizes');
 const outdir=path.join(root,'app/build/tests');fs.mkdirSync(outdir,{recursive:true});
@@ -72,5 +100,5 @@ const wav=Buffer.alloc(44+a.pcm.length*2);
 wav.write('RIFF');wav.writeUInt32LE(wav.length-8,4);wav.write('WAVEfmt ',8);wav.writeUInt32LE(16,16);wav.writeUInt16LE(1,20);wav.writeUInt16LE(2,22);wav.writeUInt32LE(44100,24);wav.writeUInt32LE(44100*4,28);wav.writeUInt16LE(4,32);wav.writeUInt16LE(16,34);wav.write('data',36);wav.writeUInt32LE(a.pcm.length*2,40);
 for(let i=0;i<a.pcm.length;i++)wav.writeInt16LE(Math.max(-32768,Math.min(32767,Math.round(a.pcm[i]*32767))),44+i*2);
 fs.writeFileSync(path.join(outdir,'wasm-performance.wav'),wav);
-const result={result:'PASS',wasmBytes:wasm.length,peak:a.peak,screenBlits:a.blits,simulatedMs:a.ms,renderedSeconds:a.pcm.length/2/44100,blockInvariant:true,allTenSamples:samplePeaks,persistence:true};
+const result={result:'PASS',wasmBytes:wasm.length,peak:a.peak,screenBlits:a.blits,simulatedMs:a.ms,renderedSeconds:a.pcm.length/2/44100,blockInvariant:true,allTenSamples:samplePeaks,persistence:true,splitOutput:true,legacySave:true};
 fs.writeFileSync(path.join(outdir,'wasm-smoke.json'),JSON.stringify(result,null,2)+'\n');console.log(result);
