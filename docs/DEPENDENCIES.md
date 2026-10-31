@@ -1,7 +1,7 @@
 # Referencing fm1-base
 
 Git tracks `fm1-base` as a submodule pinned to a commit. The gitlink has mode
-`160000`, and `.gitmodules` holds the upstream URL. Setup checks out that revision
+`160000`, and `.gitmodules` holds the public fork URL. Setup checks out that revision
 in a separate directory. Set `FM1_BASE` to use a shared or experimental checkout.
 
 ## Default setup
@@ -17,11 +17,9 @@ checkout is not reset on every build. To deliberately restore recorded dependenc
 revisions, inspect local changes first, then use Git's submodule update workflow.
 
 `patches/fm1-base-external-build.patch` makes Docker mount the app and base
-directories separately, so they can be in unrelated locations. The separate
-`patches/fm1-base-telemetry.patch` supplies the nonblocking USB
-API needed by Beets. It is applied idempotently to the default submodule, so Git
-reports that submodule as modified. The tracked patch reproduces those edits after a fresh clone. All other platform source stays in
-the upstream repository.
+directories separately, so they can be in unrelated locations. This patch is
+applied idempotently to the default submodule, which therefore appears modified.
+The pinned public fork supplies nonblocking SysEx and named multichannel USB audio.
 
 ## Shared checkout: FM1_BASE
 
@@ -67,17 +65,19 @@ target after switching dependencies before running compatibility tests.
 ## Updating the pin
 
 Review the selected upstream commit and local submodule changes before switching
-revisions. Rebase the telemetry patch if necessary; build firmware/native/WASM,
+revisions. Review the external-build patch if necessary; build firmware/native/WASM,
 run the tests, and test USB on the device. Commit the new gitlink and any patch
 changes together. Keep commits referenced by the gitlink available at the URL in
 `.gitmodules`; do not point collaborators at a local-only commit.
 
 ## Current platform revision
 
-Beets 0.3.0 pins fm1-base `4587fda7eac415da41d0012a99a32dc6af600245`
-with BSP `2cd696a2b94341077303e9132bb4be3d0a87ebcf`. This update brings MIDI
-source-mask routing, corrected load measurement, a fine timer, optimized memory
-operations, CPU clock normalization, installer discovery fixes and dim browser LEDs.
-The telemetry patch was rebased onto the updated unity build. Optional USB host
-and BLE features remain disabled. All three targets were rebuilt and USB MIDI
-was tested on the physical FM1.
+The multichannel branch builds on upstream fm1-base `4039a8b`. Its public fork
+adds named USB capture/playback channels and nonblocking SysEx, and pins a public BSP fork.
+The exact revisions are recorded by the two gitlinks. Optional USB host and BLE
+remain disabled. See the multichannel verification record for hardware coverage.
+
+The separate fm1-base PR draft retains the original upstream BSP URL. Its driver
+prerequisite must land upstream before that draft can merge; the pin will then
+use the accepted upstream commit. This Beets integration uses the published fork
+so collaborators can reproduce the tested build in the meantime.

@@ -93,6 +93,26 @@ const legacy=Object.fromEntries(Object.entries(saved).map(([k,v])=>[k,v.slice(0,
 const legacyEx=await boot(legacy);render(legacyEx,44100);press(legacyEx,10);
 assert(Buffer.from(render(legacyEx,44100).buffer).equals(Buffer.from(beforeRestore.buffer)),'legacy setup must restore unchanged in mono');
 console.log('PASS split L/R isolation, split and mono persistence, legacy save migration');
+// Actual app callback: named six-channel USB capture remains separate from analog.
+const stemsEx=await boot(); stemsEx.web_master(4096); render(stemsEx,44100);
+press(stemsEx,5); press(stemsEx,10); render(stemsEx,44100);
+assert.equal(stemsEx.web_usb_channels(),6);
+function usbBlock(ex) { return new Int32Array(ex.memory.buffer,ex.web_usb_audio(),ex.web_usb_frames()*6).slice(); }
+let usb=usbBlock(stemsEx);
+for(let i=0;i<usb.length;i+=6) {
+  assert.equal(usb[i+2],usb[i+3]); assert.equal(usb[i+4],usb[i+5]);
+  assert(Math.abs(usb[i]-(usb[i+2]/2+usb[i+4]/2))<=3);
+  assert.equal(usb[i],usb[i+1]);
+}
+stemsEx.web_master(0); render(stemsEx,44100); usb=usbBlock(stemsEx);
+let stemPeaks=[0,0];
+for(let i=0;i<usb.length;i+=6) {
+  assert.equal(usb[i],0); assert.equal(usb[i+1],0);
+  stemPeaks[0]=Math.max(stemPeaks[0],Math.abs(usb[i+2]));
+  stemPeaks[1]=Math.max(stemPeaks[1],Math.abs(usb[i+4]));
+}
+assert(stemPeaks.every(x=>x>100),'both stems survive muted analog/master');
+console.log('PASS six-channel app callback: order, duplicated mono stems, mix, MASTER independence');
 const a=perform(await boot(),128),b=perform(await boot(),256);
 assert(Buffer.from(a.pcm.buffer).equals(Buffer.from(b.pcm.buffer)),'fresh render must be reproducible across audio quantum sizes');
 const outdir=path.join(root,'app/build/tests');fs.mkdirSync(outdir,{recursive:true});
@@ -100,5 +120,5 @@ const wav=Buffer.alloc(44+a.pcm.length*2);
 wav.write('RIFF');wav.writeUInt32LE(wav.length-8,4);wav.write('WAVEfmt ',8);wav.writeUInt32LE(16,16);wav.writeUInt16LE(1,20);wav.writeUInt16LE(2,22);wav.writeUInt32LE(44100,24);wav.writeUInt32LE(44100*4,28);wav.writeUInt16LE(4,32);wav.writeUInt16LE(16,34);wav.write('data',36);wav.writeUInt32LE(a.pcm.length*2,40);
 for(let i=0;i<a.pcm.length;i++)wav.writeInt16LE(Math.max(-32768,Math.min(32767,Math.round(a.pcm[i]*32767))),44+i*2);
 fs.writeFileSync(path.join(outdir,'wasm-performance.wav'),wav);
-const result={result:'PASS',wasmBytes:wasm.length,peak:a.peak,screenBlits:a.blits,simulatedMs:a.ms,renderedSeconds:a.pcm.length/2/44100,blockInvariant:true,allTenSamples:samplePeaks,persistence:true,splitOutput:true,legacySave:true};
+const result={result:'PASS',wasmBytes:wasm.length,peak:a.peak,screenBlits:a.blits,simulatedMs:a.ms,renderedSeconds:a.pcm.length/2/44100,blockInvariant:true,allTenSamples:samplePeaks,persistence:true,splitOutput:true,legacySave:true,usbChannels:6};
 fs.writeFileSync(path.join(outdir,'wasm-smoke.json'),JSON.stringify(result,null,2)+'\n');console.log(result);

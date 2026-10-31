@@ -24,6 +24,8 @@ typedef struct {
  * are applied at the next eighth-note boundary while running; stopped cues audition. */
 void engine_init(uint32_t seed);
 void engine_render(int32_t *lr, uint32_t frames, uint32_t master_q12);
+/* Optional interleaved A L/R, B L/R: after voice/mute, before blend and MASTER. */
+void engine_render_stems(int32_t *lr, int32_t *stems, uint32_t frames, uint32_t master_q12);
 void engine_snapshot(BeetsState *state);
 void engine_play(int on);
 void engine_panic(void); /* immediate silence, including stopped auditions */

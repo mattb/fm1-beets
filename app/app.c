@@ -5,6 +5,9 @@
 #include "dsp/engine.h"
 #include "telemetry_stream.h"
 #include "midi_clock.h"
+#if FM1B_UAC_CHANNELS != 6
+#error "Beets requires six USB audio capture channels"
+#endif
 #define BEETS_SAVE_MAGIC 0x42545332u
 static const uint8_t beets_white[16] = PLAT_WHITE_KEYS;
 static const uint8_t beets_black[11] = PLAT_BLACK_KEYS;
@@ -66,6 +69,7 @@ void app_init(void)
     beets_clock_init();
     beets_snapshot();
 }
+static int32_t beets_usb_stems[APP_BLOCK * 4u];
 void app_render(int32_t *lr, uint32_t n, uint32_t master_q12)
 {
     uint32_t pkt; int port;
@@ -77,7 +81,17 @@ void app_render(int32_t *lr, uint32_t n, uint32_t master_q12)
             engine_trigger((status & 15u) == 1u ? 1 : 0, (int)note - 36);
 
     }
-    engine_render(lr, n, master_q12);
+    engine_render_stems(lr, beets_usb_stems, n, master_q12);
+}
+/* fm1-base calls this immediately after app_render, before physical output scaling. */
+void app_usb_capture(int32_t *capture, const int32_t *stereo, uint32_t n)
+{
+    uint32_t i, c;
+    for (i = 0; i < n; i++) {
+        capture[6u*i] = stereo[2u*i];
+        capture[6u*i+1u] = stereo[2u*i+1u];
+        for (c = 0; c < 4; c++) capture[6u*i+2u+c] = beets_usb_stems[4u*i+c];
+    }
 }
 void app_panic(void) { uint32_t irq = plat_lock(); beets_clock_play(0); engine_panic(); plat_unlock(irq); }
 static void beets_save(void)

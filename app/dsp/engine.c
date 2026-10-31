@@ -255,7 +255,7 @@ void engine_masks(int lane, uint32_t slice_mask, uint32_t loop_mask)
 void engine_auto(int lane, int on) { if (valid(lane)) state.lane[lane].auto_next = !!on; }
 const char *engine_loop_name(int loop) { return beets_samples[bound(loop, 0, BEETS_LOOPS - 1)].name; }
 
-void engine_render(int32_t *lr, uint32_t frames, uint32_t master_q12)
+void engine_render_stems(int32_t *lr, int32_t *stems, uint32_t frames, uint32_t master_q12)
 {
     uint32_t f;
     float master = (float)(master_q12 > 4096u ? 4096u : master_q12) / 4096.0f;
@@ -299,6 +299,12 @@ void engine_render(int32_t *lr, uint32_t frames, uint32_t master_q12)
                 v->last_output = out;
                 v->position += (float)v->direction * v->increment;
             }
+            if (stems) {
+                float stem = out * v->gain * 0.9f;
+                if (stem > 1.0f) stem = 1.0f;
+                if (stem < -1.0f) stem = -1.0f;
+                stems[4u*f + 2u*lane] = stems[4u*f + 2u*lane + 1u] = (int32_t)(stem * FULL_SCALE);
+            }
             mixed[output_split ? lane : 0] += out * v->gain * weights[lane];
             if (v->audition) v->audition--;
         }
@@ -331,6 +337,11 @@ void engine_render(int32_t *lr, uint32_t frames, uint32_t master_q12)
             }
         }
     }
+}
+
+void engine_render(int32_t *lr, uint32_t frames, uint32_t master_q12)
+{
+    engine_render_stems(lr, 0, frames, master_q12);
 }
 
 uint32_t engine_clock_phase(void) { return clock_phase; }

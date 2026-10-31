@@ -1,7 +1,38 @@
 # Current verification record
 
-Updated 2026-10-28. Installed production firmware is **0.3.1**, device identity
-`FM-1_731000301`. This revision adds persistent split output.
+## Multichannel branch — 2026-10-31
+
+Firmware, native and WASM builds and the full Beets suite passed. Default engine
+PCM compares byte-for-byte with the previous engine. WASM verifies six stems,
+split output, persistence and legacy saves. A muted Chrome smoke passed power,
+play, B unmute, Amen selection and stop.
+
+The base diagnostic passed physical six-channel input and output routing, channel
+names, native 44.1 kHz formats, a 60-second duplex tone recording and shared-impulse
+alignment. Default stereo descriptors and PCM compare exactly against upstream.
+See [duplex evidence](verification/multichannel-duplex-functional-summary.json).
+
+After functional testing and review, mono Mac→FM1→Mac loopback measured 39.669 ms
+median with 128-frame callbacks and 41.089 ms with 256-frame callbacks. Each test
+matched 36 impulses with no host callback errors. These are application wall-clock
+times including Mac buffering and scheduling; they do not isolate firmware delay.
+See [latency evidence](verification/multichannel-final-wallclock-summary.json).
+
+The diagnostic hard-zeros analog output. No analog electrical measurements or
+iPad compatibility tests were performed. Raw recordings remain under
+`build/multichannel/hardware/`; the published summaries identify their hashes.
+
+Beets **0.4.0** was then installed and identified as `FM-1_731000400`. Ten
+physical USB captures passed A-only, B-only, both-muted and both BLEND extremes
+in mono and split modes. Master channels remained zero while the expected stems
+played; duplicate deck channels differed by at most two PCM16 counts. The harness
+restored blend, mutes and output mode, left transport stopped, and returned MASTER
+to the physical pot after fresh stopped-and-muted telemetry. It never saved settings.
+See [Beets stem evidence](verification/multichannel-beets-stems.json).
+
+## Earlier production verification — 2026-10-28
+
+Firmware **0.3.1**, device identity `FM-1_731000301`, added persistent split output.
 The platform and carried patches are described in [DEPENDENCIES.md](DEPENDENCIES.md).
 
 ## Split-output update
@@ -14,7 +45,10 @@ The platform and carried patches are described in [DEPENDENCIES.md](DEPENDENCIES
   equality after returning to mono, and unchanged audio from legacy saved setups.
 - Chrome smoke checked the gesture, temporary messages, SAVE, reload, playback,
   blocked routing changes while playing, and return to mono. No captured console errors.
-- Physical USB audio captures passed channel isolation at 44.1 and 48 kHz.
+- Physical USB audio captures passed channel isolation with host capture requests
+  of 44.1 and 48 kHz. Those tests did not verify the device sampling rate. The
+  base configuration did not enable its optional 48 kHz path, so the 48 kHz
+  recording is not evidence of device-side 48 kHz support (corrected 2026-10-31).
   The mono capture had a maximum two-count PCM16 channel difference; the initial
   exact-equality capture assertion failed and the saved WAV was rechecked with that
   explicit tolerance. [Capture results and limits](verification/split-usb-audio.json).

@@ -164,8 +164,7 @@ with any frames and no requested count), 2 if timeout yields no frames or fewer
 than the requested count, 1 on setup/backend error, and 130 on Ctrl-C. Reopen the
 receiver after a device disconnect; it does not auto-reconnect.
 
-The local build wrapper applies `patches/fm1-base-telemetry.patch` to the pinned
-upstream base to provide atomic, nonblocking SysEx output and MIDI-ring guards.
+The pinned fm1-base fork provides atomic, nonblocking SysEx output and MIDI-ring guards.
 For host-only integration capture, run the native app with
 `FM1B_SYSEX_LOG=/absolute/path/capture.syx`; this file contains concatenated raw SysEx frames. Split on complete `F0`...`F7` frames and remove those two
 bytes before passing each payload to `parse_payload` in the monitor module.

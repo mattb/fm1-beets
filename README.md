@@ -97,10 +97,17 @@ survives restart; older saved setups load in mono. MASTER, deck mutes and the
 PRESETS blend still affect levels in split mode. At the center blend, each deck
 keeps its existing half-level contribution.
 
-The routing applies to stereo analog output and class-compliant USB audio from
-FM1 to the computer. In a DAW, select the FM1 audio input's two channels. The build
-flag `usb_audio_in = true` names the USB direction from the computer's perspective;
-`usb_audio_out = false` only disables computer-to-FM1 playback.
+USB audio exposes six named channels: **Master L/R**, **Deck A L/R** and
+**Deck B L/R**. The master pair follows the stereo output and its mono/split
+setting. Each deck is a mono source duplicated into its own stereo pair, captured
+after its effects and mute envelope but before BLEND and MASTER, with 0.9 headroom.
+This lets a DAW record the mix and each deck separately. MASTER can silence the
+speaker and the master pair while the separate deck channels keep recording.
+
+The USB capture interface sends 16-bit PCM at the engine’s native 44.1 kHz.
+Channel names are supplied by the device; some apps display channel numbers.
+Computer-to-FM1 USB playback remains disabled. See [USB audio routing](docs/USB-AUDIO.md)
+for signal details and the muted hardware test.
 
 ## Platform dependency
 
@@ -150,10 +157,8 @@ or see [the protocol and receiver example](docs/TELEMETRY.md).
 .venv/bin/python tools/smoke-usb-midi.py --port 'X0X FM-1'
 ```
 
-The monitor and hardware test require `mido` and `python-rtmidi`. The build wrapper
-applies `patches/fm1-base-telemetry.patch` idempotently to the pinned upstream
-submodule for atomic nonblocking SysEx output; the submodule therefore appears
-modified after setup. The bounded JSON serializer is vendored MIT-licensed
+The monitor and hardware test require `mido` and `python-rtmidi`. The pinned
+fm1-base fork supplies atomic nonblocking SysEx output. The bounded JSON serializer is vendored MIT-licensed
 [jems](app/vendor/jems/PROVENANCE.md), with ASCII Unicode escaping adaptations.
 
 For another instrument, see the [Norns porting guide](docs/NORNS-PORTING.md) and

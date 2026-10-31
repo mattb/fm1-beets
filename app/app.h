@@ -14,6 +14,8 @@ enum { OBJ_SETTINGS, OBJ_PANEL, OBJ_NOBJ };
 #define APP_STORE_MAP {0xFC000u, 0xDC000u}
 void app_init(void);
 void app_render(int32_t *lr, uint32_t n, uint32_t master_q12);
+#define APP_USB_CAPTURE
+void app_usb_capture(int32_t *capture, const int32_t *stereo, uint32_t n);
 void app_panic(void);
 void app_ui_init(void);
 void app_frame(void);

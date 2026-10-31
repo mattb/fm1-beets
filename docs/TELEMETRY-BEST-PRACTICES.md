@@ -39,17 +39,9 @@ Use an explicit path override for shared development checkouts; Beets supports
 [dependency setup](DEPENDENCIES.md)). Own your engine, UI, assets, tests and build
 wrapper in the instrument repository.
 
-Beets adds a small platform extension for whole-frame, nonblocking SysEx output.
-The extension is supplied by the tracked
-[platform patch](../patches/fm1-base-telemetry.patch), applied idempotently by
-[patch-base.sh](../tools/patch-base.sh) during setup/build. Consequently, the
-submodule appears modified after setup even though its pinned commit is unchanged.
-Do not commit a gitlink pointing at an unpublished local submodule commit: another
-developer could not clone it. For long-term distribution, an upstreamed change or
-a published, pinned fork can replace the patch.
-
-Review and test the patch on each base update. Resolve failed applicability
-checks before applying it. Use the same engine and serializer in firmware, native
+Beets uses a published fm1-base fork with whole-frame, nonblocking SysEx output.
+Pin a published commit so another developer can reproduce the build. Review and
+test platform changes on each dependency update. Use the same engine and serializer in firmware, native
 and WASM builds, and test USB transport separately on hardware.
 
 Retain source licenses and vendor provenance. The modified jems has an upstream

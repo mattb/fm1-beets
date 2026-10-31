@@ -1,0 +1,465 @@
+{
+  "firmware_sha256": "3cc397347290c4c3507da144dc898c617ecd662fbb84833d02222efdab23000a",
+  "base_commit": "5a92fb7",
+  "bsp_commit": "8183a06",
+  "result": "PASS",
+  "rate": 44100,
+  "capture_channels": 6,
+  "playback_channels": 6,
+  "capture_names": [
+    "Tone 331",
+    "Tone 487",
+    "Tone 683",
+    "Tone 947",
+    "Tone 1289",
+    "Tone 1747"
+  ],
+  "playback_names": [
+    "Input 1",
+    "Input 2",
+    "Input 3",
+    "Input 4",
+    "Input 5",
+    "Input 6"
+  ],
+  "runs": [
+    {
+      "name": "duplex-mask1",
+      "capture": "PASS",
+      "analysis": "PASS",
+      "seconds": 3.0,
+      "host_callback_error_count": 0,
+      "startup_flag_count": 0,
+      "pcm_sha256": "a5d75fa7c0dbbc2dbdc02589e853d76249383513fe0f987b2ea8479af605c3ad",
+      "analysis_details": {
+        "channels": [
+          {
+            "channel": 1,
+            "active": true,
+            "expected_hz": 331.0,
+            "measured_hz": 330.8,
+            "peak_pcm16": 4125.0,
+            "rms_pcm16": 2915.573297358876,
+            "other_tone_leakage_db": -111.31923288382535,
+            "min_10ms_rms": 2849.0336950385217,
+            "large_sample_jumps": 0
+          },
+          {
+            "channel": 2,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 3,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 4,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 5,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 6,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "name": "duplex-mask2",
+      "capture": "PASS",
+      "analysis": "PASS",
+      "seconds": 3.0,
+      "host_callback_error_count": 0,
+      "startup_flag_count": 0,
+      "pcm_sha256": "b31677bbb08380eedb0c399021f4619b56b58efce1f8b1b351edc4fe5eae3832",
+      "analysis_details": {
+        "channels": [
+          {
+            "channel": 1,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 2,
+            "active": true,
+            "expected_hz": 487.0,
+            "measured_hz": 486.8,
+            "peak_pcm16": 4125.0,
+            "rms_pcm16": 2914.8948756095606,
+            "other_tone_leakage_db": -111.57195588904759,
+            "min_10ms_rms": 2879.027022121242,
+            "large_sample_jumps": 0
+          },
+          {
+            "channel": 3,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 4,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 5,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 6,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "name": "duplex-mask4",
+      "capture": "PASS",
+      "analysis": "PASS",
+      "seconds": 3.0,
+      "host_callback_error_count": 0,
+      "startup_flag_count": 0,
+      "pcm_sha256": "e04e0e64bbfdcd0e0baa8f872b9a275eac70141ad35f6f825c01aad653b763e3",
+      "analysis_details": {
+        "channels": [
+          {
+            "channel": 1,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 2,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 3,
+            "active": true,
+            "expected_hz": 683.0,
+            "measured_hz": 682.8000000000001,
+            "peak_pcm16": 4125.0,
+            "rms_pcm16": 2913.843207757118,
+            "other_tone_leakage_db": -111.34509015524796,
+            "min_10ms_rms": 2882.486654816071,
+            "large_sample_jumps": 0
+          },
+          {
+            "channel": 4,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 5,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 6,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "name": "duplex-mask8",
+      "capture": "PASS",
+      "analysis": "PASS",
+      "seconds": 3.0,
+      "host_callback_error_count": 0,
+      "startup_flag_count": 0,
+      "pcm_sha256": "719eee1c81425572bede59436a3940eb51c9887bc8b1232377e4ca240b08adee",
+      "analysis_details": {
+        "channels": [
+          {
+            "channel": 1,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 2,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 3,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 4,
+            "active": true,
+            "expected_hz": 947.0,
+            "measured_hz": 946.8000000000001,
+            "peak_pcm16": 4125.0,
+            "rms_pcm16": 2911.88931950272,
+            "other_tone_leakage_db": -110.29205238897543,
+            "min_10ms_rms": 2904.483351983639,
+            "large_sample_jumps": 0
+          },
+          {
+            "channel": 5,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 6,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "name": "duplex-mask16",
+      "capture": "PASS",
+      "analysis": "PASS",
+      "seconds": 3.0,
+      "host_callback_error_count": 0,
+      "startup_flag_count": 0,
+      "pcm_sha256": "d71d31194d7b3cc6bf3d1bdc599599fa715591abaf600b540c4275bf1cd46bc9",
+      "analysis_details": {
+        "channels": [
+          {
+            "channel": 1,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 2,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 3,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 4,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 5,
+            "active": true,
+            "expected_hz": 1289.0,
+            "measured_hz": 1288.4,
+            "peak_pcm16": 4125.0,
+            "rms_pcm16": 2907.929113776383,
+            "other_tone_leakage_db": -110.1114034612449,
+            "min_10ms_rms": 2892.004247385094,
+            "large_sample_jumps": 0
+          },
+          {
+            "channel": 6,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "name": "duplex-mask32",
+      "capture": "PASS",
+      "analysis": "PASS",
+      "seconds": 3.0,
+      "host_callback_error_count": 0,
+      "startup_flag_count": 0,
+      "pcm_sha256": "60a56ce4b447685c97e03fcd3a1d41156292040fa547ad70bc3714500b40f8d5",
+      "analysis_details": {
+        "channels": [
+          {
+            "channel": 1,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 2,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 3,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 4,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 5,
+            "active": false,
+            "peak_pcm16": 0.0,
+            "rms_pcm16": 0.0
+          },
+          {
+            "channel": 6,
+            "active": true,
+            "expected_hz": 1747.0,
+            "measured_hz": 1746.0,
+            "peak_pcm16": 4125.0,
+            "rms_pcm16": 2901.1352646445443,
+            "other_tone_leakage_db": -110.4098625797158,
+            "min_10ms_rms": 2890.8214687476525,
+            "large_sample_jumps": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "duplex-mask63",
+      "capture": "PASS",
+      "analysis": "PASS",
+      "seconds": 60.0,
+      "host_callback_error_count": 0,
+      "startup_flag_count": 0,
+      "pcm_sha256": "58c827644a46b94a1f42ef6775389388a83e3b919491e1662d6f32b2c54f04fd",
+      "analysis_details": {
+        "channels": [
+          {
+            "channel": 1,
+            "active": true,
+            "expected_hz": 331.0,
+            "measured_hz": 330.875,
+            "peak_pcm16": 4125.0,
+            "rms_pcm16": 2915.592076870814,
+            "other_tone_leakage_db": -113.49312692961337,
+            "min_10ms_rms": 2849.0554563218457,
+            "large_sample_jumps": 0
+          },
+          {
+            "channel": 2,
+            "active": true,
+            "expected_hz": 487.0,
+            "measured_hz": 486.75,
+            "peak_pcm16": 4125.0,
+            "rms_pcm16": 2914.981906874783,
+            "other_tone_leakage_db": -109.69273901326174,
+            "min_10ms_rms": 2878.9065104905935,
+            "large_sample_jumps": 0
+          },
+          {
+            "channel": 3,
+            "active": true,
+            "expected_hz": 683.0,
+            "measured_hz": 682.75,
+            "peak_pcm16": 4125.0,
+            "rms_pcm16": 2913.8458547168866,
+            "other_tone_leakage_db": -111.12621505822082,
+            "min_10ms_rms": 2882.3902437051793,
+            "large_sample_jumps": 0
+          },
+          {
+            "channel": 4,
+            "active": true,
+            "expected_hz": 947.0,
+            "measured_hz": 946.625,
+            "peak_pcm16": 4125.0,
+            "rms_pcm16": 2911.728194583062,
+            "other_tone_leakage_db": -111.03983353082779,
+            "min_10ms_rms": 2904.2416118732367,
+            "large_sample_jumps": 0
+          },
+          {
+            "channel": 5,
+            "active": true,
+            "expected_hz": 1289.0,
+            "measured_hz": 1288.375,
+            "peak_pcm16": 4125.0,
+            "rms_pcm16": 2907.96923604443,
+            "other_tone_leakage_db": -112.90371096040224,
+            "min_10ms_rms": 2891.9937943529485,
+            "large_sample_jumps": 0
+          },
+          {
+            "channel": 6,
+            "active": true,
+            "expected_hz": 1747.0,
+            "measured_hz": 1746.25,
+            "peak_pcm16": 4125.0,
+            "rms_pcm16": 2901.1451072590885,
+            "other_tone_leakage_db": -112.64246526147312,
+            "min_10ms_rms": 2890.730485401402,
+            "large_sample_jumps": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "duplex-alignment",
+      "capture": "PASS",
+      "analysis": "PASS",
+      "seconds": 5.0,
+      "host_callback_error_count": 0,
+      "startup_flag_count": 0,
+      "pcm_sha256": "8f85666f8394d9a0d04e691dac1e7c27dda34d3b4b4a74c48f3286dfcfa5a66a",
+      "analysis_details": {
+        "peaks": [
+          3926.0,
+          3926.0,
+          3927.0,
+          3926.0,
+          3926.0,
+          3926.0
+        ],
+        "max_difference_from_ch1_pcm16": [
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "scope": "Identical-input capture equality checks interchannel alignment; not audio/USB latency."
+      }
+    }
+  ],
+  "limits": [
+    "Mac USB digital loopback; no analog electrical measurement or iPad test",
+    "Capture GET_CUR44100 verified; fixed playback rate verified by USB descriptor and physical CoreAudio format",
+    "No firmware counters or USB wire trace",
+    "Separate host callbacks avoid overflow observed when pairing differently clocked audio engines",
+    "Latency measurement intentionally deferred until final greenlight"
+  ]
+}

@@ -1,0 +1,204 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "mode": "mono-a-only",
+      "rate": 44100,
+      "peak_pcm16": [
+        0,
+        0,
+        20615,
+        20616,
+        0,
+        0
+      ],
+      "pair_error_pcm16": [
+        0,
+        2,
+        0
+      ],
+      "physical_format_evidence": "build/multichannel/hardware/beets-stems/mono-a-only-44100.json",
+      "pcm_sha256": "46fca2d0a9d59a45e33d63f2e596884003127c5f802a953827d95f3d335853eb"
+    },
+    {
+      "mode": "mono-b-only",
+      "rate": 44100,
+      "peak_pcm16": [
+        0,
+        0,
+        0,
+        0,
+        20615,
+        20615
+      ],
+      "pair_error_pcm16": [
+        0,
+        0,
+        2
+      ],
+      "physical_format_evidence": "build/multichannel/hardware/beets-stems/mono-b-only-44100.json",
+      "pcm_sha256": "442c583c7f1c77b9e3ea45ff4c736dec3d97f9119a118ff68e2ca5d15d1bda8c"
+    },
+    {
+      "mode": "mono-muted",
+      "rate": 44100,
+      "peak_pcm16": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "pair_error_pcm16": [
+        0,
+        0,
+        0
+      ],
+      "physical_format_evidence": "build/multichannel/hardware/beets-stems/mono-muted-44100.json",
+      "pcm_sha256": "c432a87b3a10ba44b0468d966fed0657f35af3613126233aba51dce1bda80fcb"
+    },
+    {
+      "mode": "mono-blend-a",
+      "rate": 44100,
+      "peak_pcm16": [
+        0,
+        0,
+        20615,
+        20616,
+        20616,
+        20615
+      ],
+      "pair_error_pcm16": [
+        0,
+        2,
+        2
+      ],
+      "physical_format_evidence": "build/multichannel/hardware/beets-stems/mono-blend-a-44100.json",
+      "pcm_sha256": "aa5996962699274f95b2c7baec0643c8e821f7db2e0e21ba17e2db52d69c0bd0"
+    },
+    {
+      "mode": "mono-blend-b",
+      "rate": 44100,
+      "peak_pcm16": [
+        0,
+        0,
+        20616,
+        20616,
+        20616,
+        20616
+      ],
+      "pair_error_pcm16": [
+        0,
+        2,
+        2
+      ],
+      "physical_format_evidence": "build/multichannel/hardware/beets-stems/mono-blend-b-44100.json",
+      "pcm_sha256": "e802a26e19dfde76b0a223c311782b5d31e9ae58409554295917f385392d274f"
+    },
+    {
+      "mode": "split-a-only",
+      "rate": 44100,
+      "peak_pcm16": [
+        0,
+        0,
+        20616,
+        20616,
+        0,
+        0
+      ],
+      "pair_error_pcm16": [
+        0,
+        2,
+        0
+      ],
+      "physical_format_evidence": "build/multichannel/hardware/beets-stems/split-a-only-44100.json",
+      "pcm_sha256": "22a5f6ba0721d955e0e071ef4e465eec3d28757a86ca9da467dfffb7ce51e4ed"
+    },
+    {
+      "mode": "split-b-only",
+      "rate": 44100,
+      "peak_pcm16": [
+        0,
+        0,
+        0,
+        0,
+        20616,
+        20615
+      ],
+      "pair_error_pcm16": [
+        0,
+        0,
+        2
+      ],
+      "physical_format_evidence": "build/multichannel/hardware/beets-stems/split-b-only-44100.json",
+      "pcm_sha256": "c20a58b9baf9c103e9acc06d9f0bf90ed3e88b7c937422a217de25b6f5582c0e"
+    },
+    {
+      "mode": "split-muted",
+      "rate": 44100,
+      "peak_pcm16": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "pair_error_pcm16": [
+        0,
+        0,
+        0
+      ],
+      "physical_format_evidence": "build/multichannel/hardware/beets-stems/split-muted-44100.json",
+      "pcm_sha256": "c432a87b3a10ba44b0468d966fed0657f35af3613126233aba51dce1bda80fcb"
+    },
+    {
+      "mode": "split-blend-a",
+      "rate": 44100,
+      "peak_pcm16": [
+        0,
+        0,
+        20616,
+        20616,
+        20615,
+        20615
+      ],
+      "pair_error_pcm16": [
+        0,
+        2,
+        2
+      ],
+      "physical_format_evidence": "build/multichannel/hardware/beets-stems/split-blend-a-44100.json",
+      "pcm_sha256": "8b21cefd43497fa00421c6ca007dc890ccf549cdd1dbd50ac73c2d00998112fd"
+    },
+    {
+      "mode": "split-blend-b",
+      "rate": 44100,
+      "peak_pcm16": [
+        0,
+        0,
+        20615,
+        20616,
+        20616,
+        20615
+      ],
+      "pair_error_pcm16": [
+        0,
+        2,
+        2
+      ],
+      "physical_format_evidence": "build/multichannel/hardware/beets-stems/split-blend-b-44100.json",
+      "pcm_sha256": "287ad0cb90fdddbb12088bcd1082373510978d5433b1a70bd46ff24b0212ab0c"
+    }
+  ],
+  "transport_left_stopped": true,
+  "saved_settings_written": false,
+  "limitations": [
+    "No physical analog recording"
+  ],
+  "firmware_sha256": "8d0f3e7334777ffcf3bd6b0a08bdaf97368402ed79131c17801e1d285f3b9470",
+  "device_identity": "FM-1_731000400",
+  "base_commit": "25edf3c",
+  "bsp_commit": "8183a06"
+}

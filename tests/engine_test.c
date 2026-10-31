@@ -99,7 +99,41 @@ static void panic_and_stop_audition(void) {
     assert(state().playing==0);
     puts("PASS idempotent stop cancels audition; update panic silences immediately");
 }
+static void usb_stems(void) {
+    int32_t lr[512], stems[1024], reference[512];
+    engine_init(42); engine_mute(1,0); engine_play(1);
+    engine_render_stems(lr,stems,256,4096);
+    int peak_a=0, peak_b=0;
+    for(int i=0;i<256;i++) {
+        assert(stems[4*i]==stems[4*i+1] && stems[4*i+2]==stems[4*i+3]);
+        assert(abs(lr[2*i]-(stems[4*i]/2+stems[4*i+2]/2)) <= 3);
+        if(abs(stems[4*i])>peak_a) peak_a=abs(stems[4*i]);
+        if(abs(stems[4*i+2])>peak_b) peak_b=abs(stems[4*i+2]);
+    }
+    assert(peak_a>100 && peak_b>100);
+    engine_init(42); engine_mute(1,0); engine_play(1); engine_render(reference,256,4096);
+    assert(!memcmp(lr,reference,sizeof lr));
+    engine_init(42); engine_mute(1,0); engine_blend(0); engine_play(1);
+    engine_render_stems(lr,stems,256,0);
+    peak_a=peak_b=0;
+    for(int i=0;i<256;i++) {
+        assert(lr[2*i]==0 && lr[2*i+1]==0);
+        if(abs(stems[4*i])>peak_a) peak_a=abs(stems[4*i]);
+        if(abs(stems[4*i+2])>peak_b) peak_b=abs(stems[4*i+2]);
+    }
+    assert(peak_a>100 && peak_b>100); /* MASTER and blend do not erase stems */
+    engine_output_split(1); engine_blend(100);
+    engine_mute(0,1); frames(10000); engine_render_stems(lr,stems,256,4096);
+    peak_b=0;
+    for(int i=0;i<256;i++) {
+        assert(stems[4*i]==0 && stems[4*i+1]==0);
+        assert(lr[2*i]==0 && lr[2*i+1]==stems[4*i+2]);
+        if(abs(stems[4*i+2])>peak_b) peak_b=abs(stems[4*i+2]);
+    }
+    assert(peak_b>100);
+    puts("PASS USB stems: stereo duplication, mix relationship, optional stem capture preserves mix, independent levels");
+}
 int main(void) {
-    straight_and_mutations(); range_masks_and_queue(); audio_and_determinism(); stress(); stopped_sample_change(); panic_and_stop_audition();
+    usb_stems(); straight_and_mutations(); range_masks_and_queue(); audio_and_determinism(); stress(); stopped_sample_change(); panic_and_stop_audition();
     puts("ALL ENGINE TESTS PASSED"); return 0;
 }

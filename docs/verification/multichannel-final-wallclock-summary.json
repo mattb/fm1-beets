@@ -1,0 +1,84 @@
+{
+  "firmware_sha256": "3cc397347290c4c3507da144dc898c617ecd662fbb84833d02222efdab23000a",
+  "base_runtime_commit": "5a92fb7",
+  "bsp_commit": "8183a06",
+  "rate": 44100,
+  "path": "Mac USB output channel1 -> muted FM1 diagnostic loopback -> Mac USB input channel1",
+  "timing_definition": "Application wallclock measured with time.perf_counter_ns at outgoing callback handoff and incoming callback receipt, paired using uniquely spaced impulses. Includes host buffers and scheduling; not firmware-only latency.",
+  "runs": [
+    {
+      "result": "PASS",
+      "matched_pulses": 36,
+      "requested_blocksize": 128,
+      "actual_callback_frames": [
+        128
+      ],
+      "portaudio_latency_seconds": [
+        0.014693877551020407,
+        0.013696145124716553
+      ],
+      "application_wallclock_ms": {
+        "min": 36.986167,
+        "median": 39.668979,
+        "p95": 50.838177,
+        "max": 51.249583
+      },
+      "sample_timeline_lag_ms": {
+        "min": 93.65079365079364,
+        "median": 95.77097505668934,
+        "p95": 97.53401360544218,
+        "max": 97.73242630385487
+      },
+      "adc_dac_timestamp_estimate_ms": {
+        "min": 13.06501393992221,
+        "median": 13.320833306352142,
+        "p95": 13.436395040116622,
+        "max": 13.483941038430203
+      },
+      "host_callback_errors": [],
+      "startup_callback_flags": [],
+      "pcm_sha256": "6811e6d305c6aa4c2e22755fa6e22b1c037a4c47af58265dbb3b723a654518ec",
+      "report": "build/multichannel/hardware/final-wallclock-128.wallclock.json"
+    },
+    {
+      "result": "PASS",
+      "matched_pulses": 36,
+      "requested_blocksize": 256,
+      "actual_callback_frames": [
+        256
+      ],
+      "portaudio_latency_seconds": [
+        0.014693877551020407,
+        0.013696145124716553
+      ],
+      "application_wallclock_ms": {
+        "min": 30.755417,
+        "median": 41.088604000000004,
+        "p95": 50.325447999999994,
+        "max": 51.478708
+      },
+      "sample_timeline_lag_ms": {
+        "min": 91.97278911564625,
+        "median": 93.94557823129252,
+        "p95": 95.71995464852608,
+        "max": 95.89569160997732
+      },
+      "adc_dac_timestamp_estimate_ms": {
+        "min": 13.1020277767675,
+        "median": 13.355517068703193,
+        "p95": 13.48718754707079,
+        "max": 13.545456684369128
+      },
+      "host_callback_errors": [],
+      "startup_callback_flags": [],
+      "pcm_sha256": "0d9576d0ce362e30794cda5af58bb50a97b4d00a371dca821b6275ea868156d4",
+      "report": "build/multichannel/hardware/final-wallclock-256.wallclock.json"
+    }
+  ],
+  "limits": [
+    "No analog path or electrical latency measurement",
+    "CoreAudio ADC/DAC timestamps are host estimates",
+    "All otherfivechannels remainedsilentwithin2PCM16counts",
+    "Tests run after functional suite and house review on unchanged firmware"
+  ]
+}
